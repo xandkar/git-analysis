@@ -1,0 +1,39 @@
+#! /usr/bin/env Rscript
+# vim: filetype=r:
+
+ParseDates <- function(lines) {
+  # Using relative timestamps literally instead of converting with as.POSIXct,
+  # because commits could've been made from several timezones, in which case I
+  # think it is more interesting to see the time as perceived by the committer
+  # rather than a globally normalized time.
+  #
+  # An example timestamp line: "Tue Nov 6 21:28:48 2012 -0500"
+  #
+  dates <- matrix(unlist(strsplit(lines, " +")), ncol=6, byrow=TRUE)
+  days  <- dates[,1]
+  times <- dates[,4]
+  hours <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)[,1]
+  list( days  = days
+      , hours = hours
+      )
+}
+
+Main <- function() {
+  lines <- system("git log --format=%ad", intern=TRUE)
+  dates <- ParseDates(lines)
+  punchcard <- data.frame(Day=dates$days, Hour=dates$hours)
+  punchcard <- as.data.frame(table(punchcard))
+  punchcard <-
+    ( ggplot2::ggplot(punchcard, ggplot2::aes(y=Day, x=Hour))
+    + ggplot2::geom_point(ggplot2::aes(size=Freq))
+    + ggplot2::scale_size(range=c(1, 15))
+    + ggplot2::ylim("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
+    )
+  ggplot2::ggsave( filename = "punchcard.png"
+                 , plot     = punchcard
+                 , width    = 10
+                 , height   = 5
+                 )
+}
+
+Main()
