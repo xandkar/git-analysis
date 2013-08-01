@@ -4,6 +4,17 @@ git-anal
 An exploratory analysis of a Git repository.
 
 
+Example
+-------
+Compare punchcards of top 2 committers to OCaml repository:
+```shell
+$ git clone https://github.com/ocaml/ocaml.git
+$ cd ocaml
+$ git-anal-punchcard.R 2 && open punchcard.png
+```
+![OCaml](https://raw.github.com/ibnfirnas/git-anal/master/examples/ocaml-punchcard-top-2.png)
+
+
 Ideas
 -----
 * 2D, GitHub-like punchcard:
