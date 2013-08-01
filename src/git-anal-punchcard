@@ -26,7 +26,7 @@ Main <- function() {
   punchcard <-
     ( ggplot2::ggplot(punchcard, ggplot2::aes(y=Day, x=Hour))
     + ggplot2::geom_point(ggplot2::aes(size=Freq))
-    + ggplot2::scale_size(range=c(1, 15))
+    + ggplot2::scale_size(range=c(0, 15))
     )
   ggplot2::ggsave( filename = "punchcard.png"
                  , plot     = punchcard
