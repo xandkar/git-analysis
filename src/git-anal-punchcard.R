@@ -17,9 +17,15 @@ ParseTimestamps <- function(timestamps) {
       )
 }
 
-ParseLines <- function(log.lines) {
+ParseLines <- function(lines) {
   # Example log line: "Tue Nov 6 21:28:48 2012 -0500|Jeff Lebowski"
-  log.data  <- matrix(unlist(strsplit(log.lines, "\\|")), ncol=2, byrow=T)
+  line.comps <- strsplit(lines, "\\|")
+
+  # Drop lines with missing data (most likely names)
+  line.comps.lengths <- lapply(line.comps, length)
+  line.comps <- line.comps[line.comps.lengths == 2]
+
+  log.data  <- matrix(unlist(line.comps), ncol=2, byrow=T)
   log.times <- ParseTimestamps(log.data[,1])
   log.names <- log.data[,2]
   all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
