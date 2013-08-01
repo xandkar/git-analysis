@@ -13,21 +13,20 @@ ParseDates <- function(lines) {
   days  <- dates[,1]
   times <- dates[,4]
   hours <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)[,1]
-  list( days  = days
-      , hours = hours
-      )
+  all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
+  all.hours <- 0:23
+  data.frame( Day  = factor(days , levels=all.days)
+            , Hour = factor(hours, levels=all.hours)
+            )
 }
 
 Main <- function() {
   lines <- system("git log --format=%ad", intern=TRUE)
-  dates <- ParseDates(lines)
-  punchcard <- data.frame(Day=dates$days, Hour=dates$hours)
-  punchcard <- as.data.frame(table(punchcard))
+  punchcard <- as.data.frame(table(ParseDates(lines)))
   punchcard <-
     ( ggplot2::ggplot(punchcard, ggplot2::aes(y=Day, x=Hour))
     + ggplot2::geom_point(ggplot2::aes(size=Freq))
     + ggplot2::scale_size(range=c(1, 15))
-    + ggplot2::ylim("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
     )
   ggplot2::ggsave( filename = "punchcard.png"
                  , plot     = punchcard
