@@ -91,6 +91,8 @@ ParseLog <- function(lines) {
   data.frame( Day  = factor(log.times$days , levels=all.days)
             , Hour = factor(log.times$hours, levels=all.hours)
             , Name = log.names
+            , Insertions = log.insertions
+            , Deletions  = log.deletions
             )
 }
 
@@ -98,35 +100,67 @@ GetTopCommitters <- function(data, n=4) {
   names(sort(table(data$Name), decreasing=TRUE))[1:n]
 }
 
-PlotPunchcard <- function(data, byname=FALSE) {
+PlotPunchcard <- function(data, byname=FALSE, showdiff=FALSE) {
   p <-
     ( ggplot2::ggplot(data, ggplot2::aes(y=Day, x=Hour))
     + ggplot2::geom_point(ggplot2::aes(size=Freq))
     + ggplot2::scale_size(range=c(0, 10))
     )
-  if (byname)
-    p + ggplot2::facet_wrap(~ Name, ncol=1)
-  else
-    p
+  p <-
+    if (byname)
+      p + ggplot2::facet_wrap(~ Name, ncol=1)
+    else
+      p
+  p <-
+    if (showdiff)
+      ( p
+      + ggplot2::aes(color=Diff)
+      + ggplot2::scale_colour_gradient2( low=scales::muted("red")
+                                       , high=scales::muted("green")
+                                       )
+      )
+    else
+      p
+}
+
+LookupEdits <- function(tbl.row, log.data) {
+  log.rows <- log.data[ log.data$Day  == tbl.row[1]
+                      & log.data$Hour == tbl.row[2]
+                      & log.data$Name == tbl.row[3]
+                      ,
+                      ]
+  insertions <- as.numeric(log.rows$Insertions)
+  deletions  <- as.numeric(log.rows$Deletions)
+  c( sum(insertions)
+   , sum(deletions)
+   )
 }
 
 Main <- function() {
   args <- commandArgs(trailingOnly=TRUE)
   n.top.committers <- if (length(args) > 0) args[1] else 0
+  showdiff <- if ((length(args) > 1) & args[2] == "diff") TRUE else FALSE
 
   log.cmd   <- "git log --format='%ad|%an' --numstat | grep -v '^$'"
   log.lines <- system(log.cmd, intern=TRUE)
   log.data  <- ParseLog(log.lines)
 
-  punchcard.tbl  <- as.data.frame(table(log.data))
+  # Leave-out edits columns from frquency count
+  punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
+
+  edits <- apply(punchcard.tbl, 1, LookupEdits, log.data)
+  insertions <- edits[1, ]
+  deletions  <- edits[2, ]
+  punchcard.tbl$Diff <- insertions + (-(deletions))
+
   punchcard.plot <- (
     if (n.top.committers > 0) {
       top.committers <- GetTopCommitters(log.data, n.top.committers)
       punchcard.tbl <- punchcard.tbl[punchcard.tbl$Name %in% top.committers,]
-      PlotPunchcard(punchcard.tbl, byname=TRUE)
+      PlotPunchcard(punchcard.tbl, byname=TRUE, showdiff=showdiff)
     }
     else {
-      PlotPunchcard(punchcard.tbl)
+      PlotPunchcard(punchcard.tbl, showdiff=showdiff)
     }
   )
   ggplot2::ggsave( filename = "punchcard.png"
