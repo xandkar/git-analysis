@@ -188,7 +188,7 @@ Main <- function() {
   # Leave-out edits columns from frquency count
   punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
 
-  punchcard.tbl <-
+  punchcard.tbl <- (
     # Re-inserting the edit data is very expensive, so we're better off
     # avoiding it unless explicitly asked to
     if (opts$is.show.diff) {
@@ -201,6 +201,7 @@ Main <- function() {
     } else {
       punchcard.tbl
     }
+  )
 
   punchcard.plot <- (
     if (opts$n.top.committers > 0) {
