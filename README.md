@@ -4,8 +4,8 @@ git-anal
 An exploratory analysis of a Git repository.
 
 
-Example
--------
+Examples
+--------
 Compare punchcards of top 2 committers to OCaml repository:
 ```shell
 $ git clone https://github.com/ocaml/ocaml.git
@@ -13,6 +13,15 @@ $ cd ocaml
 $ git-anal-punchcard.R 2 && open punchcard.png
 ```
 ![OCaml](https://raw.github.com/ibnfirnas/git-anal/master/examples/ocaml-punchcard-top-2.png)
+
+Compare punchcards, with diff proportions, of top 4 committers to erlcloud
+repository:
+```shell
+$ git clone https://github.com/gleber/erlcloud.git
+$ cd erlcloud
+$ git-anal-punchcard.R 4 diff && open punchcard.png
+```
+![erlcloud](https://raw.github.com/ibnfirnas/git-anal/master/examples/erlcloud-punchcard-top-4-diff.png)
 
 
 Ideas
