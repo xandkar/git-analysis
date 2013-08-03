@@ -17,9 +17,11 @@ ParseTimestamps <- function(timestamps) {
       )
 }
 
+
 DashesToZeros <- function(v) {
   ifelse(v == "-", 0, v)
 }
+
 
 MsgFlatten <- function(msg) {
   len <- length(msg)
@@ -36,6 +38,7 @@ MsgFlatten <- function(msg) {
   else
     paste(c(head, 0, 0), collapse="|")
 }
+
 
 ExtractMsgs <- function(lines) {
   msg.start.indices <- grep("^[A-Z]", lines)
@@ -55,6 +58,7 @@ ExtractMsgs <- function(lines) {
   msgs <- lapply(msgs, MsgFlatten)
   unlist(msgs)
 }
+
 
 ParseLog <- function(lines) {
   # Example log lines:
@@ -96,9 +100,11 @@ ParseLog <- function(lines) {
             )
 }
 
+
 GetTopCommitters <- function(data, n=4) {
   names(sort(table(data$Name), decreasing=TRUE))[1:n]
 }
+
 
 PlotPunchcard <- function(data, byname=FALSE, showdiff=FALSE) {
   p <-
@@ -123,6 +129,7 @@ PlotPunchcard <- function(data, byname=FALSE, showdiff=FALSE) {
       p
 }
 
+
 LookupEdits <- function(tbl.row, log.data) {
   log.rows <- log.data[ log.data$Day  == tbl.row[1]
                       & log.data$Hour == tbl.row[2]
@@ -135,6 +142,7 @@ LookupEdits <- function(tbl.row, log.data) {
    , sum(deletions)
    )
 }
+
 
 Main <- function() {
   args <- commandArgs(trailingOnly=TRUE)
@@ -169,5 +177,6 @@ Main <- function() {
                  , height   = 5
                  )
 }
+
 
 Main()
