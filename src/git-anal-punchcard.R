@@ -183,7 +183,7 @@ GetOpts <- function() {
 
 Main <- function() {
   opts <- GetOpts()
-  log.data  <- ParseLog(FetchLog())
+  log.data <- ParseLog(FetchLog())
 
   # Leave-out edits columns from frquency count
   punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
@@ -213,6 +213,7 @@ Main <- function() {
       PlotPunchcard(punchcard.tbl, is.show.diff=opts$is.show.diff)
     }
   )
+
   ggplot2::ggsave( filename = "punchcard.png"
                  , plot     = punchcard.plot
                  , width    = 10
