@@ -144,14 +144,18 @@ LookupEdits <- function(tbl.row, log.data) {
 }
 
 
+FetchLog <- function() {
+  command <- "git log --format='%ad|%an' --numstat | grep -v '^$'"
+  system(command, intern=TRUE)
+}
+
+
 Main <- function() {
   args <- commandArgs(trailingOnly=TRUE)
   n.top.committers <- if (length(args) > 0) args[1] else 0
   is.show.diff <- if ((length(args) > 1) & args[2] == "diff") TRUE else FALSE
 
-  log.cmd   <- "git log --format='%ad|%an' --numstat | grep -v '^$'"
-  log.lines <- system(log.cmd, intern=TRUE)
-  log.data  <- ParseLog(log.lines)
+  log.data  <- ParseLog(FetchLog())
 
   # Leave-out edits columns from frquency count
   punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
