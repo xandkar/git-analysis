@@ -161,20 +161,26 @@ FetchLog <- function() {
 
 GetOpts <- function() {
   args <- commandArgs(trailingOnly=TRUE)
+
+  indices.nums <- grep("^[0-9]+$", args)
+  indices.diff <- grep("^diff$", args)
+
   n.top.committers <- (
-    if (length(args) > 0) {
-      args[1]
+    if (length(indices.nums) > 0) {
+      args[indices.nums[1]]
     } else {
       0
     }
   )
+
   is.show.diff <- (
-    if ((length(args) > 1) & args[2] == "diff") {
+    if (length(indices.diff) > 0) {
       TRUE
     } else {
       FALSE
     }
   )
+
   list( n.top.committers = n.top.committers
       , is.show.diff     = is.show.diff
       )
