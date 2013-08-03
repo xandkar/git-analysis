@@ -173,16 +173,8 @@ GetOpts <- function() {
     }
   )
 
-  is.show.diff <- (
-    if (length(indices.diff) > 0) {
-      TRUE
-    } else {
-      FALSE
-    }
-  )
-
   list( n.top.committers = n.top.committers
-      , is.show.diff     = is.show.diff
+      , is.show.diff     = length(indices.diff) > 0
       )
 }
 
