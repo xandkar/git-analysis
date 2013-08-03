@@ -132,6 +132,7 @@ PlotPunchcard <- function(data, is.by.name=FALSE, is.show.diff=FALSE) {
     } else {
       p
     }
+  p
 }
 
 
