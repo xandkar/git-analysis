@@ -34,9 +34,9 @@ MsgFlatten <- function(msg) {
     total.insertions <- sum(insertions)
     total.deletions  <- sum(deletions)
     paste(c(head, total.insertions, total.deletions), collapse="|")
-  }
-  else
+  } else {
     paste(c(head, 0, 0), collapse="|")
+  }
 }
 
 
@@ -47,10 +47,11 @@ ExtractMsgs <- function(lines) {
   num.lines <- length(lines)
   for (i in 1:num.msgs) {
     range <- (
-      if (i == num.msgs)
+      if (i == num.msgs) {
         msg.start.indices[i]:num.lines
-      else
+      } else {
         msg.start.indices[i]:(msg.start.indices[i+1] - 1)
+      }
     )
     msg.range.indices[[i]] <- range
   }
@@ -112,21 +113,25 @@ PlotPunchcard <- function(data, is.by.name=FALSE, is.show.diff=FALSE) {
     + ggplot2::geom_point(ggplot2::aes(size=Freq))
     + ggplot2::scale_size(range=c(0, 10))
     )
+
   p <-
-    if (is.by.name)
+    if (is.by.name) {
       p + ggplot2::facet_wrap(~ Name, ncol=1)
-    else
+    } else {
       p
+    }
+
   p <-
-    if (is.show.diff)
+    if (is.show.diff) {
       ( p
       + ggplot2::aes(color=Diff)
       + ggplot2::scale_colour_gradient2( low=scales::muted("red")
                                        , high=scales::muted("green")
                                        )
       )
-    else
+    } else {
       p
+    }
 }
 
 
@@ -152,8 +157,20 @@ FetchLog <- function() {
 
 GetOpts <- function() {
   args <- commandArgs(trailingOnly=TRUE)
-  n.top.committers <- if (length(args) > 0) args[1] else 0
-  is.show.diff <- if ((length(args) > 1) & args[2] == "diff") TRUE else FALSE
+  n.top.committers <- (
+    if (length(args) > 0) {
+      args[1]
+    } else {
+      0
+    }
+  )
+  is.show.diff <- (
+    if ((length(args) > 1) & args[2] == "diff") {
+      TRUE
+    } else {
+      FALSE
+    }
+  )
   list( n.top.committers = n.top.committers
       , is.show.diff     = is.show.diff
       )
@@ -180,8 +197,7 @@ Main <- function() {
                    , is.by.name   = TRUE
                    , is.show.diff = opts$is.show.diff
                    )
-    }
-    else {
+    } else {
       PlotPunchcard(punchcard.tbl, is.show.diff=opts$is.show.diff)
     }
   )
