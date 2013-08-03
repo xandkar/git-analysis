@@ -9,9 +9,9 @@ ParseTimestamps <- function(timestamps) {
   # think it is more interesting to see the time as perceived by the committer
   # rather than a globally normalized time.
   components <- matrix(unlist(strsplit(timestamps, " +")), ncol=6, byrow=TRUE)
-  days       <- components[,1]
-  times      <- components[,4]
-  hours      <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)[,1]
+  days       <- components[, 1]
+  times      <- components[, 4]
+  hours      <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)[, 1]
   list( days  = days
       , hours = hours
       )
@@ -29,8 +29,8 @@ MsgFlatten <- function(msg) {
   if (len > 1) {
     edits <- msg[2:len]
     edits <- matrix(unlist(strsplit(edits, "\t")), ncol=3, byrow=TRUE)
-    insertions <- as.numeric(DashesToZeros(edits[,1]))
-    deletions  <- as.numeric(DashesToZeros(edits[,2]))
+    insertions <- as.numeric(DashesToZeros(edits[, 1]))
+    deletions  <- as.numeric(DashesToZeros(edits[, 2]))
     total.insertions <- sum(insertions)
     total.deletions  <- sum(deletions)
     paste(c(head, total.insertions, total.deletions), collapse="|")
@@ -85,11 +85,11 @@ ParseLog <- function(lines) {
   msg.fields <- msg.fields[msg.comps.lengths == number.of.msg.fields]
 
   log.data  <- matrix(unlist(msg.fields), ncol=number.of.msg.fields, byrow=T)
-  log.times <- ParseTimestamps(log.data[,1])
-  log.names <- log.data[,2]
+  log.times <- ParseTimestamps(log.data[, 1])
+  log.names <- log.data[, 2]
 
-  log.insertions <- log.data[,3]
-  log.deletions  <- log.data[,4]
+  log.insertions <- log.data[, 3]
+  log.deletions  <- log.data[, 4]
 
   all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
   all.hours <- 0:23
@@ -196,7 +196,7 @@ Main <- function() {
   punchcard.plot <- (
     if (opts$n.top.committers > 0) {
       top.committers <- GetTopCommitters(log.data, opts$n.top.committers)
-      punchcard.tbl <- punchcard.tbl[punchcard.tbl$Name %in% top.committers,]
+      punchcard.tbl <- punchcard.tbl[punchcard.tbl$Name %in% top.committers, ]
       PlotPunchcard( punchcard.tbl
                    , is.by.name   = TRUE
                    , is.show.diff = opts$is.show.diff
