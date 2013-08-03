@@ -197,6 +197,7 @@ Main <- function() {
       insertions <- edits[1, ]
       deletions  <- edits[2, ]
       punchcard.tbl$Diff <- insertions + (-(deletions))
+      punchcard.tbl
     } else {
       punchcard.tbl
     }
