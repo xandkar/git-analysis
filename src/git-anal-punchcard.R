@@ -188,10 +188,18 @@ Main <- function() {
   # Leave-out edits columns from frquency count
   punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
 
-  edits <- apply(punchcard.tbl, 1, LookupEdits, log.data)
-  insertions <- edits[1, ]
-  deletions  <- edits[2, ]
-  punchcard.tbl$Diff <- insertions + (-(deletions))
+  punchcard.tbl <-
+    # Re-inserting the edit data is very expensive, so we're better off
+    # avoiding it unless explicitly asked to
+    if (opts$is.show.diff) {
+      # The following call to "apply" was 84% of the cost, accodrding to Rprof
+      edits <- apply(punchcard.tbl, 1, LookupEdits, log.data)
+      insertions <- edits[1, ]
+      deletions  <- edits[2, ]
+      punchcard.tbl$Diff <- insertions + (-(deletions))
+    } else {
+      punchcard.tbl
+    }
 
   punchcard.plot <- (
     if (opts$n.top.committers > 0) {
