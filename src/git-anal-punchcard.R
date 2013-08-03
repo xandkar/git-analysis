@@ -106,19 +106,19 @@ GetTopCommitters <- function(data, n=4) {
 }
 
 
-PlotPunchcard <- function(data, byname=FALSE, showdiff=FALSE) {
+PlotPunchcard <- function(data, is.by.name=FALSE, is.show.diff=FALSE) {
   p <-
     ( ggplot2::ggplot(data, ggplot2::aes(y=Day, x=Hour))
     + ggplot2::geom_point(ggplot2::aes(size=Freq))
     + ggplot2::scale_size(range=c(0, 10))
     )
   p <-
-    if (byname)
+    if (is.by.name)
       p + ggplot2::facet_wrap(~ Name, ncol=1)
     else
       p
   p <-
-    if (showdiff)
+    if (is.show.diff)
       ( p
       + ggplot2::aes(color=Diff)
       + ggplot2::scale_colour_gradient2( low=scales::muted("red")
@@ -147,7 +147,7 @@ LookupEdits <- function(tbl.row, log.data) {
 Main <- function() {
   args <- commandArgs(trailingOnly=TRUE)
   n.top.committers <- if (length(args) > 0) args[1] else 0
-  showdiff <- if ((length(args) > 1) & args[2] == "diff") TRUE else FALSE
+  is.show.diff <- if ((length(args) > 1) & args[2] == "diff") TRUE else FALSE
 
   log.cmd   <- "git log --format='%ad|%an' --numstat | grep -v '^$'"
   log.lines <- system(log.cmd, intern=TRUE)
@@ -165,10 +165,10 @@ Main <- function() {
     if (n.top.committers > 0) {
       top.committers <- GetTopCommitters(log.data, n.top.committers)
       punchcard.tbl <- punchcard.tbl[punchcard.tbl$Name %in% top.committers,]
-      PlotPunchcard(punchcard.tbl, byname=TRUE, showdiff=showdiff)
+      PlotPunchcard(punchcard.tbl, is.by.name=TRUE, is.show.diff=is.show.diff)
     }
     else {
-      PlotPunchcard(punchcard.tbl, showdiff=showdiff)
+      PlotPunchcard(punchcard.tbl, is.show.diff=is.show.diff)
     }
   )
   ggplot2::ggsave( filename = "punchcard.png"
