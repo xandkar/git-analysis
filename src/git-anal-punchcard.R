@@ -150,11 +150,18 @@ FetchLog <- function() {
 }
 
 
-Main <- function() {
+GetOpts <- function() {
   args <- commandArgs(trailingOnly=TRUE)
   n.top.committers <- if (length(args) > 0) args[1] else 0
   is.show.diff <- if ((length(args) > 1) & args[2] == "diff") TRUE else FALSE
+  list( n.top.committers = n.top.committers
+      , is.show.diff     = is.show.diff
+      )
+}
 
+
+Main <- function() {
+  opts <- GetOpts()
   log.data  <- ParseLog(FetchLog())
 
   # Leave-out edits columns from frquency count
@@ -166,13 +173,16 @@ Main <- function() {
   punchcard.tbl$Diff <- insertions + (-(deletions))
 
   punchcard.plot <- (
-    if (n.top.committers > 0) {
-      top.committers <- GetTopCommitters(log.data, n.top.committers)
+    if (opts$n.top.committers > 0) {
+      top.committers <- GetTopCommitters(log.data, opts$n.top.committers)
       punchcard.tbl <- punchcard.tbl[punchcard.tbl$Name %in% top.committers,]
-      PlotPunchcard(punchcard.tbl, is.by.name=TRUE, is.show.diff=is.show.diff)
+      PlotPunchcard( punchcard.tbl
+                   , is.by.name   = TRUE
+                   , is.show.diff = opts$is.show.diff
+                   )
     }
     else {
-      PlotPunchcard(punchcard.tbl, is.show.diff=is.show.diff)
+      PlotPunchcard(punchcard.tbl, is.show.diff=opts$is.show.diff)
     }
   )
   ggplot2::ggsave( filename = "punchcard.png"
