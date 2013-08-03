@@ -108,31 +108,34 @@ GetTopCommitters <- function(data, n=4) {
 
 
 PlotPunchcard <- function(data, is.by.name=FALSE, is.show.diff=FALSE) {
-  p <-
+  punchcard.plot <-
     ( ggplot2::ggplot(data, ggplot2::aes(y=Day, x=Hour))
     + ggplot2::geom_point(ggplot2::aes(size=Freq))
     + ggplot2::scale_size(range=c(0, 10))
     )
 
-  p <-
+  punchcard.plot <-
     if (is.by.name) {
-      p + ggplot2::facet_wrap(~ Name, ncol=1)
+      ( punchcard.plot
+      + ggplot2::facet_wrap(~ Name, ncol=1)
+      )
     } else {
-      p
+      punchcard.plot
     }
 
-  p <-
+  punchcard.plot <-
     if (is.show.diff) {
-      ( p
+      ( punchcard.plot
       + ggplot2::aes(color=Diff)
       + ggplot2::scale_colour_gradient2( low=scales::muted("red")
                                        , high=scales::muted("green")
                                        )
       )
     } else {
-      p
+      punchcard.plot
     }
-  p
+
+  punchcard.plot
 }
 
 
