@@ -28,6 +28,10 @@ $ git-anal-punchcard.R 4 diff && open punchcard.png
 Ideas
 -----
 * 2D, GitHub-like punchcard:
+    - optionally parse time as either:
+        + author-local
+        + analyst-local (as in computer running this program)
+        + UTC
     - ~~basic punchcard~~
     - broken down by:
         + ~~author~~
