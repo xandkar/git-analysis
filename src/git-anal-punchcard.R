@@ -145,14 +145,14 @@ PlotPunchcard <- function( data
 
 
 LookupEdits <- function(tbl.row, log.data) {
-  log.rows <- log.data[ log.data$Day  == tbl.row[1]
+  log.data <- log.data[ log.data$Day  == tbl.row[1]
                       & log.data$Hour == tbl.row[2]
                       & log.data$Name == tbl.row[3]
                       ,
                       ]
-  if (nrow(log.rows) > 0) {
-    c( sum(log.rows$Insertions)
-     , sum(log.rows$Deletions)
+  if (nrow(log.data) > 0) {
+    c( sum(log.data$Insertions)
+     , sum(log.data$Deletions)
      )
   } else {
     c(0, 0)
