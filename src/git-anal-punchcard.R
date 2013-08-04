@@ -207,6 +207,7 @@ GetOpts <- function() {
 
 Main <- function() {
   Sys.setlocale(locale="C")
+  options(warn=1)
   opts <- GetOpts()
   log.data <- ParseLog(FetchLog())
 
