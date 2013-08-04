@@ -244,7 +244,7 @@ Main <- function() {
     }
   )
 
-  dir.create(DATA.DIR)
+  dir.create(DATA.DIR, showWarnings=FALSE)
 
   ggplot2::ggsave( filename = file.path(DATA.DIR, "punchcard.png")
                  , plot     = punchcard.plot
