@@ -25,6 +25,11 @@ $ git-anal-punchcard.R 4 diff && open punchcard.png
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-anal/master/examples/otp-punchcard-top-4-diff.png)
 
 
+TODO
+----
+* Optionally reuse parsed data instead of re-parsing on each run
+
+
 Ideas
 -----
 * 2D, GitHub-like punchcard:
