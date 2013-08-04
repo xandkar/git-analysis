@@ -107,7 +107,11 @@ GetTopCommitters <- function(data, n=4) {
 }
 
 
-PlotPunchcard <- function(data, is.by.name=FALSE, is.show.diff=FALSE) {
+PlotPunchcard <- function( data
+                         , is.by.name    = FALSE
+                         , is.show.diff  = FALSE
+                         , is.show.edits = FALSE
+                         ) {
   punchcard.plot <-
     ( ggplot2::ggplot(data, ggplot2::aes(y=Day, x=Hour))
     + ggplot2::geom_point(ggplot2::aes(size=Freq))
@@ -124,12 +128,16 @@ PlotPunchcard <- function(data, is.by.name=FALSE, is.show.diff=FALSE) {
     }
 
   punchcard.plot <-
-    if (is.show.diff) {
+    if (is.show.diff & !is.show.edits) {
       ( punchcard.plot
       + ggplot2::aes(color=Diff)
       + ggplot2::scale_colour_gradient2( low=scales::muted("red")
                                        , high=scales::muted("green")
                                        )
+      )
+    } else if (!is.show.diff & is.show.edits) {
+      ( punchcard.plot
+      + ggplot2::aes(color=Edits)
       )
     } else {
       punchcard.plot
@@ -164,6 +172,20 @@ GetOpts <- function() {
 
   indices.nums <- grep("^[0-9]+$", args)
   indices.diff <- grep("^diff$", args)
+  indices.edits <- grep("^edits$", args)
+
+  diff.or.edits <- (
+    if ((length(indices.diff) > 0) & (length(indices.edits) > 0)) {
+      # Last-specified wins:
+      args[max(max(indices.diff), max(indices.edits))]
+    } else if ((length(indices.diff) > 0) & !(length(indices.edits) > 0)) {
+      "diff"
+    } else if (!(length(indices.diff) > 0) & (length(indices.edits) > 0)) {
+      "edits"
+    } else {
+      "NEITHER"
+    }
+  )
 
   n.top.committers <- (
     if (length(indices.nums) > 0) {
@@ -174,7 +196,8 @@ GetOpts <- function() {
   )
 
   list( n.top.committers = n.top.committers
-      , is.show.diff     = length(indices.diff) > 0
+      , is.show.diff     = if (diff.or.edits == "diff")  TRUE else FALSE
+      , is.show.edits    = if (diff.or.edits == "edits") TRUE else FALSE
       )
 }
 
@@ -189,12 +212,13 @@ Main <- function() {
   punchcard.tbl <- (
     # Re-inserting the edit data is very expensive, so we're better off
     # avoiding it unless explicitly asked to
-    if (opts$is.show.diff) {
+    if (opts$is.show.diff | opts$is.show.edits) {
       # The following call to "apply" was 84% of the cost, accodrding to Rprof
       edits <- apply(punchcard.tbl, 1, LookupEdits, log.data)
       insertions <- edits[1, ]
       deletions  <- edits[2, ]
-      punchcard.tbl$Diff <- insertions + (-(deletions))
+      punchcard.tbl$Diff  <- insertions + (-(deletions))
+      punchcard.tbl$Edits <- insertions + (  deletions)
       punchcard.tbl
     } else {
       punchcard.tbl
@@ -206,11 +230,15 @@ Main <- function() {
       top.committers <- GetTopCommitters(log.data, opts$n.top.committers)
       punchcard.tbl <- punchcard.tbl[punchcard.tbl$Name %in% top.committers, ]
       PlotPunchcard( punchcard.tbl
-                   , is.by.name   = TRUE
-                   , is.show.diff = opts$is.show.diff
+                   , is.by.name    = TRUE
+                   , is.show.diff  = opts$is.show.diff
+                   , is.show.edits = opts$is.show.edits
                    )
     } else {
-      PlotPunchcard(punchcard.tbl, is.show.diff=opts$is.show.diff)
+      PlotPunchcard( punchcard.tbl
+                   , is.show.diff  = opts$is.show.diff
+                   , is.show.edits = opts$is.show.edits
+                   )
     }
   )
 
