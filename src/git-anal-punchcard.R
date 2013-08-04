@@ -29,13 +29,28 @@ DashesToZeros <- function(v) {
 MsgFlatten <- function(msg) {
   len <- length(msg)
   head <- msg[1]
-  if (len > 1) {
-    edits <- msg[2:len]
+  edits <- (
+    if (len > 1) {
+      edits <- msg[2:len]
+      edits.indices.double.checked <- grep("^(\\d+|-)\t(\\d+|-)\t.+", edits)
+      if (length(edits) == length(edits.indices.double.checked)) {
+        edits
+      } else {
+        write("WARNING: some edit lines are in unexpected format.", stderr())
+        edits[edits.indices.double.checked]
+      }
+    } else {
+      vector()
+    }
+  )
+
+  if (length(edits) > 0) {
     edits <- matrix(unlist(strsplit(edits, "\t")), ncol=3, byrow=TRUE)
     insertions <- as.numeric(DashesToZeros(edits[, 1]))
     deletions  <- as.numeric(DashesToZeros(edits[, 2]))
     total.insertions <- sum(insertions)
     total.deletions  <- sum(deletions)
+
     paste(c(head, total.insertions, total.deletions), collapse="|")
   } else {
     paste(c(head, 0, 0), collapse="|")
