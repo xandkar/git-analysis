@@ -42,6 +42,7 @@ Ideas
         + remove unusually large edits
           (e.g. a drop-in or a removal of a 3rd party library)
         + ~~punches colored by~~
+        + characters inserted/deleted stats in addition to lines
         + punches sized by
             * show count of commits at the same time:
                 - insert number inside the punch hole?
