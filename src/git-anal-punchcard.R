@@ -66,19 +66,19 @@ ExtractMsgs <- function(lines) {
 
 ParseLog <- function(lines) {
   # Example log lines:
-  #   Tue Nov 6 21:28:48 2012 -0500|Jeff Lebowski
+  #   Tue Nov 6 21:28:48 2012 -0500|Jeff Lebowski|550829ec241af50979f6a131dc864830681ac99d
   #   0\t3\tsrc/foo_bar.erl
   #   1\t4\tsrc/foo_baz.erl
   #   14\t15\tREADME.md
-  #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak
+  #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak|d140fd203486725c3eb377c43b7b5e9bb382d9cd
   #   -\t-\tbin/blob
   #   2\t4\tsrc/foo_year.erl
   #
   # Will be extracted as:
-  #   Tue Nov 6 21:28:48 2012 -0500|Jeff Lebowski|1|7
-  #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak|2|4
+  #   Tue Nov 6 21:28:48 2012 -0500|Jeff Lebowski|550829ec241af50979f6a131dc864830681ac99d|1|7
+  #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak|d140fd203486725c3eb377c43b7b5e9bb382d9cd|2|4
 
-  number.of.msg.fields <- 4
+  number.of.msg.fields <- 5
 
   msgs       <- ExtractMsgs(lines)
   msg.fields <- strsplit(msgs, "\\|")
@@ -96,8 +96,9 @@ ParseLog <- function(lines) {
   data.frame( Day  = factor(log.times$days , levels=all.days)
             , Hour = factor(log.times$hours, levels=all.hours)
             , Name = factor(log.data[, 2])
-            , Insertions = as.numeric(log.data[, 3])
-            , Deletions  = as.numeric(log.data[, 4])
+            , Hash = log.data[, 3]
+            , Insertions = as.numeric(log.data[, 4])
+            , Deletions  = as.numeric(log.data[, 5])
             )
 }
 
@@ -164,7 +165,7 @@ LookupEdits <- function(tbl.row, log.data) {
 
 
 FetchLog <- function() {
-  command <- "git log --format='%ad|%an' --numstat | grep -v '^$'"
+  command <- "git log --format='%ad|%an|%H' --numstat | grep -v '^$'"
   system(command, intern=TRUE)
 }
 
@@ -208,7 +209,7 @@ Main <- function() {
   opts <- GetOpts()
   log.data <- ParseLog(FetchLog())
 
-  # Leave-out edits columns from frquency count
+  # Leave-out edits and hash columns from frquency count
   punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
 
   punchcard.tbl <- (
