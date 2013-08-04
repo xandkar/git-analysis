@@ -6,22 +6,23 @@ An exploratory analysis of a Git repository.
 
 Examples
 --------
-Compare punchcards of top 2 committers to OCaml repository:
+Compare punchcards of top 4 committers to Erlang/OTP repository:
 ```shell
-$ git clone https://github.com/ocaml/ocaml.git
-$ cd ocaml
-$ git-anal-punchcard.R 2 && open punchcard.png
+$ git clone git://github.com/erlang/otp.git
+$ cd otp
 ```
-![OCaml](https://raw.github.com/ibnfirnas/git-anal/master/examples/ocaml-punchcard-top-2.png)
-
-Compare punchcards, with diff proportions, of top 4 committers to erlcloud
-repository:
+First color-scaled by total edits (insertions + deletions)
 ```shell
-$ git clone https://github.com/gleber/erlcloud.git
-$ cd erlcloud
+$ git-anal-punchcard.R 4 edits && open punchcard.png
+```
+![Erlang/OTP](https://raw.github.com/ibnfirnas/git-anal/master/examples/otp-punchcard-top-4-edits.png)
+
+Now the same but with diff proportions instead of total edits scale (greener
+for more insertions and redder for more deletions):
+```shell
 $ git-anal-punchcard.R 4 diff && open punchcard.png
 ```
-![erlcloud](https://raw.github.com/ibnfirnas/git-anal/master/examples/erlcloud-punchcard-top-4-diff.png)
+![Erlang/OTP](https://raw.github.com/ibnfirnas/git-anal/master/examples/otp-punchcard-top-4-diff.png)
 
 
 Ideas
