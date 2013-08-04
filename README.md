@@ -28,16 +28,16 @@ $ git-anal-punchcard.R 4 diff && open punchcard.png
 Ideas
 -----
 * 2D, GitHub-like punchcard:
-    - basic punchcrad
+    - ~~basic punchcard~~
     - broken down by:
-        + author
+        + ~~author~~
         + branch
         + language
         + permutations of the above criteria
     - deletions/additions scale
         + remove unusually large edits
           (e.g. a drop-in or a removal of a 3rd party library)
-        + punches colored by
+        + ~~punches colored by~~
         + punches sized by
             * show count of commits at the same time:
                 - insert number inside the punch hole?
