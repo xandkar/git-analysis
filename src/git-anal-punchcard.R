@@ -252,6 +252,7 @@ Main <- function() {
                  , height   = 5
                  )
   write.csv(punchcard.tbl, file=file.path(DATA.DIR, "punchcard.csv"))
+  write.csv(log.data     , file=file.path(DATA.DIR, "log.csv"))
 }
 
 
