@@ -31,7 +31,6 @@ Ideas
     - basic punchcrad
     - broken down by:
         + author
-        + committer
         + branch
         + language
         + permutations of the above criteria
