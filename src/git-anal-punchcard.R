@@ -1,6 +1,9 @@
 #! /usr/bin/env Rscript
 # vim: filetype=r:
 
+DATA.DIR <- ".git-anal"
+
+
 ParseTimestamps <- function(timestamps) {
   # Example timestamp: "Tue Nov 6 21:28:48 2012 -0500"
   #
@@ -241,12 +244,14 @@ Main <- function() {
     }
   )
 
-  ggplot2::ggsave( filename = "punchcard.png"
+  dir.create(DATA.DIR)
+
+  ggplot2::ggsave( filename = file.path(DATA.DIR, "punchcard.png")
                  , plot     = punchcard.plot
                  , width    = 10
                  , height   = 5
                  )
-  write.csv(punchcard.tbl, file="punchcard.csv")
+  write.csv(punchcard.tbl, file=file.path(DATA.DIR, "punchcard.csv"))
 }
 
 
