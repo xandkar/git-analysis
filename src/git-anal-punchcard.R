@@ -13,7 +13,7 @@ ParseTimestamps <- function(timestamps) {
   times      <- components[, 4]
   hours      <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)[, 1]
   list( days  = days
-      , hours = hours
+      , hours = as.numeric(hours)
       )
 }
 
