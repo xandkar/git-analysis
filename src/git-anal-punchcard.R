@@ -247,6 +247,7 @@ Main <- function() {
                  , width    = 10
                  , height   = 5
                  )
+  write.csv(punchcard.tbl, file="punchcard.csv")
 }
 
 
