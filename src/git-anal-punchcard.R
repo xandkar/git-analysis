@@ -44,7 +44,10 @@ MsgFlatten <- function(msg) {
 
 
 ExtractMsgs <- function(lines) {
-  msg.start.indices <- grep("^[A-Z]", lines)
+  msg.start.indices <-
+    grep("^[A-Z]{1}[a-z]{2} [A-Z]{1}[a-z]{2} \\d{1,2} \\d{2}:\\d{2}:\\d{2} \\d+ [+-]\\d{4}"
+        , lines
+        )
   msg.range.indices <- list()
   num.msgs  <- length(msg.start.indices)
   num.lines <- length(lines)
