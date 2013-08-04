@@ -216,8 +216,8 @@ Main <- function() {
       edits <- apply(punchcard.tbl, 1, LookupEdits, log.data)
       insertions <- edits[1, ]
       deletions  <- edits[2, ]
-      punchcard.tbl$Diff  <- insertions + (-(deletions))
-      punchcard.tbl$Edits <- insertions + (  deletions)
+      punchcard.tbl$Diff  <- insertions - deletions
+      punchcard.tbl$Edits <- insertions + deletions
       punchcard.tbl
     } else {
       punchcard.tbl
