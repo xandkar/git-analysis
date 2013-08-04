@@ -86,18 +86,15 @@ ParseLog <- function(lines) {
 
   log.data  <- matrix(unlist(msg.fields), ncol=number.of.msg.fields, byrow=T)
   log.times <- ParseTimestamps(log.data[, 1])
-  log.names <- log.data[, 2]
-
-  log.insertions <- log.data[, 3]
-  log.deletions  <- log.data[, 4]
 
   all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
   all.hours <- 0:23
+
   data.frame( Day  = factor(log.times$days , levels=all.days)
             , Hour = factor(log.times$hours, levels=all.hours)
-            , Name = log.names
-            , Insertions = as.numeric(log.insertions)
-            , Deletions  = as.numeric(log.deletions)
+            , Name = log.data[, 2]
+            , Insertions = as.numeric(log.data[, 3])
+            , Deletions  = as.numeric(log.data[, 4])
             )
 }
 
