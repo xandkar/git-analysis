@@ -96,8 +96,8 @@ ParseLog <- function(lines) {
   data.frame( Day  = factor(log.times$days , levels=all.days)
             , Hour = factor(log.times$hours, levels=all.hours)
             , Name = log.names
-            , Insertions = log.insertions
-            , Deletions  = log.deletions
+            , Insertions = as.numeric(log.insertions)
+            , Deletions  = as.numeric(log.deletions)
             )
 }
 
@@ -153,11 +153,13 @@ LookupEdits <- function(tbl.row, log.data) {
                       & log.data$Name == tbl.row[3]
                       ,
                       ]
-  insertions <- as.numeric(log.rows$Insertions)
-  deletions  <- as.numeric(log.rows$Deletions)
-  c( sum(insertions)
-   , sum(deletions)
-   )
+  if (nrow(log.rows) > 0) {
+    c( sum(log.rows$Insertions)
+     , sum(log.rows$Deletions)
+     )
+  } else {
+    c(0, 0)
+  }
 }
 
 
