@@ -92,7 +92,7 @@ ParseLog <- function(lines) {
 
   data.frame( Day  = factor(log.times$days , levels=all.days)
             , Hour = factor(log.times$hours, levels=all.hours)
-            , Name = log.data[, 2]
+            , Name = factor(log.data[, 2])
             , Insertions = as.numeric(log.data[, 3])
             , Deletions  = as.numeric(log.data[, 4])
             )
