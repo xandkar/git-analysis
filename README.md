@@ -28,6 +28,7 @@ $ git-anal-punchcard.R 4 diff && open punchcard.png
 TODO
 ----
 * Optionally reuse parsed data instead of re-parsing on each run
+* Use a CLI options parsing library
 
 
 Ideas
