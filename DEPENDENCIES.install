@@ -1,0 +1,8 @@
+#! /usr/bin/env Rscript
+# vim: filetype=r:
+
+mirrors <- getCRANmirrors()
+mirrors <- mirrors[mirrors$Country == "USA" & mirrors$City == "Bethesda", ]
+mirror  <- mirrors[1, ]
+
+install.packages(readLines("DEPENDENCIES"), repos=mirror$URL)
