@@ -244,6 +244,7 @@ PunchcardStore <- function(df) {
 Main <- function() {
   options(warn=1)
   Sys.setlocale(locale="C")
+  dir.create(DATA.DIR, showWarnings=FALSE)
   opts <- GetOpts()
   log.data <- ParseLog(FetchLog())
   LogStore(log.data)
@@ -284,8 +285,6 @@ Main <- function() {
                    )
     }
   )
-
-  dir.create(DATA.DIR, showWarnings=FALSE)
 
   ggplot2::ggsave( filename = file.path(DATA.DIR, "punchcard.png")
                  , plot     = punchcard.plot
