@@ -256,10 +256,9 @@ Main <- function() {
   log.data <- ParseLog(FetchLog())
   LogStore(log.data)
 
-  # Leave-out edits and hash columns from frquency count
-  punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
-
-  punchcard.tbl <- (
+  punchcard.tbl <- {
+    # Leave-out edits and hash columns from frquency count
+    punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
     # Re-inserting the edit data is very expensive, so we're better off
     # avoiding it unless explicitly asked to
     if (opts$is.show.diff | opts$is.show.edits) {
@@ -273,7 +272,7 @@ Main <- function() {
     } else {
       punchcard.tbl
     }
-  )
+  }
   PunchcardStore(punchcard.tbl)
 
   punchcard.plot <- (
