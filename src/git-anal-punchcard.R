@@ -232,8 +232,8 @@ DataStore <- function(d) {
 
 
 Main <- function() {
-  Sys.setlocale(locale="C")
   options(warn=1)
+  Sys.setlocale(locale="C")
   opts <- GetOpts()
   log.data <- ParseLog(FetchLog())
 
