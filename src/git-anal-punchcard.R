@@ -223,7 +223,7 @@ GetOpts <- function() {
 }
 
 
-CSVStore <- function(lst) {
+StoreCSV <- function(lst) {
   write.csv( lst$data
            , file      = file.path(kDataDir, lst$filename)
            , row.names = FALSE
@@ -231,13 +231,13 @@ CSVStore <- function(lst) {
 }
 
 
-LogStore <- function(df) {
-  CSVStore(list(data=df, filename="log.csv"))
+StoreLog <- function(df) {
+  StoreCSV(list(data=df, filename="log.csv"))
 }
 
 
-PunchcardStore <- function(df) {
-  CSVStore(list(data=df, filename="punchcard.csv"))
+StorePunchcardTable <- function(df) {
+  StoreCSV(list(data=df, filename="punchcard.csv"))
 }
 
 
@@ -254,7 +254,7 @@ Main <- function() {
   opts <- GetOpts()
 
   log.data <- ParseLog(FetchLog())
-  LogStore(log.data)
+  StoreLog(log.data)
 
   punchcard.tbl <- {
     # Leave-out edits and hash columns from frquency count
@@ -273,7 +273,7 @@ Main <- function() {
       punchcard.tbl
     }
   }
-  PunchcardStore(punchcard.tbl)
+  StorePunchcardTable(punchcard.tbl)
 
   punchcard.plot <- (
     if (opts$n.top.committers > 0) {
