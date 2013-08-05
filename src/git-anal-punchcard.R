@@ -225,8 +225,8 @@ GetOpts <- function() {
 
 DataStore <- function(d) {
   write.csv( d$data
-           , file=file.path(DATA.DIR, d$filename)
-           , row.names=FALSE
+           , file      = file.path(DATA.DIR, d$filename)
+           , row.names = FALSE
            )
 }
 
