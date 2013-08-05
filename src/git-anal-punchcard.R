@@ -241,11 +241,18 @@ PunchcardStore <- function(df) {
 }
 
 
-Main <- function() {
+DoInit <- function() {
   options(warn=1)
   Sys.setlocale(locale="C")
   dir.create(DATA.DIR, showWarnings=FALSE)
+}
+
+
+Main <- function() {
+  DoInit()
+
   opts <- GetOpts()
+
   log.data <- ParseLog(FetchLog())
   LogStore(log.data)
 
