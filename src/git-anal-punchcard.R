@@ -241,6 +241,15 @@ StorePunchcardTable <- function(df) {
 }
 
 
+StorePunchcardPlot <- function(p) {
+  ggplot2::ggsave( filename = file.path(kDataDir, "punchcard.png")
+                 , plot     = p
+                 , width    = 10
+                 , height   = 5
+                 )
+}
+
+
 DoInit <- function() {
   options(warn=1)
   Sys.setlocale(locale="C")
@@ -291,12 +300,7 @@ Main <- function() {
                    )
     }
   )
-
-  ggplot2::ggsave( filename = file.path(kDataDir, "punchcard.png")
-                 , plot     = punchcard.plot
-                 , width    = 10
-                 , height   = 5
-                 )
+  StorePunchcardPlot(punchcard.plot)
 }
 
 
