@@ -17,8 +17,7 @@ $ git-analysis 4 edits && open punchcard.png
 ```
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-edits.png)
 
-Now the same but with diff proportions instead of total edits scale (greener
-for more insertions and redder for more deletions):
+Then the same but with diff proportions (insertions - deletions):
 ```shell
 $ git-analysis 4 diff && open punchcard.png
 ```
