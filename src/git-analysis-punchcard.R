@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 # vim: filetype=r:
 
-kDataDir <- ".git-anal"
+kDataDir <- ".git-analysis"
 
 
 ParseTimestamps <- function(timestamps) {
