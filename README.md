@@ -27,7 +27,6 @@ $ git-analysis 4 diff && open .git-analysis/punchcard.png
 TODO
 ----
 * Optionally reuse parsed data instead of re-parsing on each run
-* Use a CLI options parsing library
 
 
 Ideas
