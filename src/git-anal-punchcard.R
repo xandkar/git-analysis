@@ -223,11 +223,21 @@ GetOpts <- function() {
 }
 
 
-DataStore <- function(d) {
-  write.csv( d$data
-           , file      = file.path(DATA.DIR, d$filename)
+CSVStore <- function(lst) {
+  write.csv( lst$data
+           , file      = file.path(DATA.DIR, lst$filename)
            , row.names = FALSE
            )
+}
+
+
+LogStore <- function(df) {
+  CSVStore(list(data=df, filename="log.csv"))
+}
+
+
+PunchcardStore <- function(df) {
+  CSVStore(list(data=df, filename="punchcard.csv"))
 }
 
 
@@ -236,9 +246,11 @@ Main <- function() {
   Sys.setlocale(locale="C")
   opts <- GetOpts()
   log.data <- ParseLog(FetchLog())
+  LogStore(log.data)
 
   # Leave-out edits and hash columns from frquency count
   punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
+  PunchcardStore(punchcard.tbl)
 
   punchcard.tbl <- (
     # Re-inserting the edit data is very expensive, so we're better off
@@ -280,11 +292,6 @@ Main <- function() {
                  , width    = 10
                  , height   = 5
                  )
-  data.to.store <-
-    list( list(data=punchcard.tbl, filename="punchcard.csv")
-        , list(data=log.data     , filename="log.csv")
-        )
-  lapply(data.to.store, DataStore) -> dev.null
 }
 
 
