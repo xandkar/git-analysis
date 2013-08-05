@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 # vim: filetype=r:
 
-DATA.DIR <- ".git-anal"
+kDataDir <- ".git-anal"
 
 
 ParseTimestamps <- function(timestamps) {
@@ -225,7 +225,7 @@ GetOpts <- function() {
 
 CSVStore <- function(lst) {
   write.csv( lst$data
-           , file      = file.path(DATA.DIR, lst$filename)
+           , file      = file.path(kDataDir, lst$filename)
            , row.names = FALSE
            )
 }
@@ -244,7 +244,7 @@ PunchcardStore <- function(df) {
 DoInit <- function() {
   options(warn=1)
   Sys.setlocale(locale="C")
-  dir.create(DATA.DIR, showWarnings=FALSE)
+  dir.create(kDataDir, showWarnings=FALSE)
 }
 
 
@@ -292,7 +292,7 @@ Main <- function() {
     }
   )
 
-  ggplot2::ggsave( filename = file.path(DATA.DIR, "punchcard.png")
+  ggplot2::ggsave( filename = file.path(kDataDir, "punchcard.png")
                  , plot     = punchcard.plot
                  , width    = 10
                  , height   = 5
