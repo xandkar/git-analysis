@@ -13,13 +13,13 @@ $ cd otp
 ```
 First color-scaled by total edits (insertions + deletions)
 ```shell
-$ git-analysis 4 edits && open punchcard.png
+$ git-analysis 4 edits && open .git-analysis/punchcard.png
 ```
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-edits.png)
 
 Then the same but with diff proportions (insertions - deletions):
 ```shell
-$ git-analysis 4 diff && open punchcard.png
+$ git-analysis 4 diff && open .git-analysis/punchcard.png
 ```
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-diff.png)
 
