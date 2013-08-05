@@ -223,6 +223,13 @@ GetOpts <- function() {
 }
 
 
+DataStore <- function(d) {
+  write.csv( d$data
+           , file=file.path(DATA.DIR, d$filename)
+           )
+}
+
+
 Main <- function() {
   Sys.setlocale(locale="C")
   options(warn=1)
@@ -272,8 +279,11 @@ Main <- function() {
                  , width    = 10
                  , height   = 5
                  )
-  write.csv(punchcard.tbl, file=file.path(DATA.DIR, "punchcard.csv"))
-  write.csv(log.data     , file=file.path(DATA.DIR, "log.csv"))
+  data.to.store <-
+    list( list(data=punchcard.tbl, filename="punchcard.csv")
+        , list(data=log.data     , filename="log.csv")
+        )
+  lapply(data.to.store, DataStore) -> dev.null
 }
 
 
