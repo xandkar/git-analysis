@@ -10,7 +10,8 @@ Compare punchcards of top 4 committers to Erlang/OTP repository:
 ```shell
 $ git clone git://github.com/erlang/otp.git
 $ cd otp
-$ git-analysis -n 4
+$ time git-analysis -n 4
+110.97s user 0.42s system 99% cpu 1:51.48 total
 $ ls -1 .git-analysis
 log.csv
 punchcard-all-diff.png
