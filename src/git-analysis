@@ -234,7 +234,9 @@ StorePunchcardTable <- function(df) {
 
 
 StorePunchcardPlots <- function(plots, n.committers) {
-  filenames <- sub(".n.", sprintf(".%d.", n.committers), names(plots))
+  filenames <- names(plots)
+  filenames <- gsub("\\.", "-", filenames)
+  filenames <- sub("-n-", sprintf("-%d-", n.committers), filenames)
   filenames <- paste("punchcard", filenames, sep="-")
   filenames <- paste(filenames  , "png"    , sep=".")
   len <- length(plots)

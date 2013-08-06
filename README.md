@@ -13,13 +13,13 @@ $ cd otp
 $ git-analysis -n 4
 $ ls -1 .git-analysis
 log.csv
-punchcard-all.diff.png
-punchcard-all.edits.png
+punchcard-all-diff.png
+punchcard-all-edits.png
 punchcard-all.png
 punchcard.csv
-punchcard-top.4.committers.diff.png
-punchcard-top.4.committers.edits.png
-punchcard-top.4.committers.png
+punchcard-top-4-committers-diff.png
+punchcard-top-4-committers-edits.png
+punchcard-top-4-committers.png
 ```
 
 `punchcard-top.4.committers.edits.png`: punch holes color-scaled by total edits
