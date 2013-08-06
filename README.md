@@ -10,17 +10,24 @@ Compare punchcards of top 4 committers to Erlang/OTP repository:
 ```shell
 $ git clone git://github.com/erlang/otp.git
 $ cd otp
+$ git-analysis -n 4
+$ ls -1 .git-analysis
+log.csv
+punchcard-all.diff.png
+punchcard-all.edits.png
+punchcard-all.png
+punchcard.csv
+punchcard-top.4.committers.diff.png
+punchcard-top.4.committers.edits.png
+punchcard-top.4.committers.png
 ```
-First color-scaled by total edits (insertions + deletions)
-```shell
-$ git-analysis -n 4 --show_edits && open .git-analysis/punchcard.png
-```
+
+`punchcard-top.4.committers.edits.png`: punch holes color-scaled by total edits
+(insertions + deletions)
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-edits.png)
 
-Then the same but with diff proportions (insertions - deletions):
-```shell
-$ git-analysis -n 4 --show_diff && open .git-analysis/punchcard.png
-```
+`punchcard-top.4.committers.diff.png`: punch holes color-scaled by diff
+proportions (insertions - deletions):
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-diff.png)
 
 
