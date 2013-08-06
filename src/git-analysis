@@ -149,43 +149,47 @@ GetTopCommitters <- function(data, n=4) {
 }
 
 
-PlotPunchcard <- function( data
-                         , is.by.name    = FALSE
-                         , is.show.diff  = FALSE
-                         , is.show.edits = FALSE
-                         ) {
-  punchcard.plot <-
-    ( ggplot2::ggplot(data, ggplot2::aes(y=Day, x=Hour))
-    + ggplot2::geom_point(ggplot2::aes(size=Freq))
-    + ggplot2::scale_size(range=c(0, 10))
-    )
+CountFrequencyOfCommits <- function(log) {
+  # Leave-out edits and hash columns from frquency count
+  punchcard.tbl <- as.data.frame(table(log[, 1:3]))
 
-  punchcard.plot <-
-    if (is.by.name) {
-      ( punchcard.plot
-      + ggplot2::facet_wrap(~ Name, ncol=1)
-      )
-    } else {
-      punchcard.plot
-    }
+  # The following call to "apply" was 84% of the cost, accodrding to Rprof
+  edits <- apply(punchcard.tbl, 1, LookupEdits, log)
 
-  punchcard.plot <-
-    if (is.show.diff & !is.show.edits) {
-      ( punchcard.plot
-      + ggplot2::aes(color=Diff)
-      + ggplot2::scale_colour_gradient2( low=scales::muted("red")
-                                       , high=scales::muted("green")
-                                       )
-      )
-    } else if (!is.show.diff & is.show.edits) {
-      ( punchcard.plot
-      + ggplot2::aes(color=Edits)
-      )
-    } else {
-      punchcard.plot
-    }
+  insertions <- edits[1, ]
+  deletions  <- edits[2, ]
 
-  punchcard.plot
+  punchcard.tbl$Diff  <- insertions - deletions
+  punchcard.tbl$Edits <- insertions + deletions
+  punchcard.tbl
+}
+
+
+PlotPunchcards <- function(data.all, data.top.n) {
+  axis <- ggplot2::aes(y=Day, x=Hour)
+  geom <-
+    list( ggplot2::geom_point(ggplot2::aes(size=Freq))
+        , ggplot2::scale_size(range=c(0, 10))
+        )
+  facets.names <- ggplot2::facet_wrap(~ Name, ncol=1)
+  color.edits <- ggplot2::aes(color=Edits)
+  color.diff <-
+      list( ggplot2::aes(color=Diff)
+          , ggplot2::scale_colour_gradient2( low=scales::muted("red")
+                                           , high=scales::muted("green")
+                                           )
+          )
+
+  plot.all   <- ggplot2::ggplot(data.all)   + axis + geom
+  plot.top.n <- ggplot2::ggplot(data.top.n) + axis + geom + facets.names
+
+  list( all                    = plot.all
+      , all.edits              = plot.all   + color.edits
+      , all.diff               = plot.all   + color.diff
+      , top.n.committers       = plot.top.n
+      , top.n.committers.edits = plot.top.n + color.edits
+      , top.n.committers.diff  = plot.top.n + color.diff
+      )
 }
 
 
@@ -229,12 +233,20 @@ StorePunchcardTable <- function(df) {
 }
 
 
-StorePunchcardPlot <- function(p) {
-  ggplot2::ggsave( filename = file.path(kDataDir, "punchcard.png")
-                 , plot     = p
-                 , width    = 10
-                 , height   = 5
-                 )
+StorePunchcardPlots <- function(plots, n.committers) {
+  filenames <- sub(".n.", sprintf(".%d.", n.committers), names(plots))
+  filenames <- paste("punchcard", filenames, sep="-")
+  filenames <- paste(filenames  , "png"    , sep=".")
+  len <- length(plots)
+  if (len > 0) {
+    for (i in 1:len) {
+      ggplot2::ggsave( filename = file.path(kDataDir, filenames[i])
+                     , plot     = plots[[i]]
+                     , width    = 10
+                     , height   = 5
+                     )
+    }
+  }
 }
 
 
@@ -242,17 +254,7 @@ OptParse <- function() {
   options <-
     list( optparse::make_option( c("-n", "--n_top_committers")
                                , type    = "integer"
-                               , default = 0
-                               )
-        , optparse::make_option( c("-d", "--show_diff")
-                               , type    = "logical"
-                               , action  = "store_true"
-                               , default = FALSE
-                               )
-        , optparse::make_option( c("-e", "--show_edits")
-                               , type    = "logical"
-                               , action  = "store_true"
-                               , default = FALSE
+                               , default = 4
                                )
         )
   optparse::parse_args(optparse::OptionParser(option_list=options))
@@ -274,42 +276,15 @@ Main <- function() {
   log.data <- ParseLog(FetchLog())
   StoreLog(log.data)
 
-  punchcard.tbl <- {
-    # Leave-out edits and hash columns from frquency count
-    punchcard.tbl <- as.data.frame(table(log.data[, 1:3]))
-    # Re-inserting the edit data is very expensive, so we're better off
-    # avoiding it unless explicitly asked to
-    if (opt$show_diff | opt$show_edits) {
-      # The following call to "apply" was 84% of the cost, accodrding to Rprof
-      edits <- apply(punchcard.tbl, 1, LookupEdits, log.data)
-      insertions <- edits[1, ]
-      deletions  <- edits[2, ]
-      punchcard.tbl$Diff  <- insertions - deletions
-      punchcard.tbl$Edits <- insertions + deletions
-      punchcard.tbl
-    } else {
-      punchcard.tbl
-    }
-  }
+  punchcard.tbl <- CountFrequencyOfCommits(log.data)
   StorePunchcardTable(punchcard.tbl)
 
-  punchcard.plot <- (
-    if (opt$n_top_committers > 0) {
-      top.committers <- GetTopCommitters(log.data, opt$n_top_committers)
-      punchcard.tbl <- punchcard.tbl[punchcard.tbl$Name %in% top.committers, ]
-      PlotPunchcard( punchcard.tbl
-                   , is.by.name    = TRUE
-                   , is.show.diff  = opt$show_diff
-                   , is.show.edits = opt$show_edits
-                   )
-    } else {
-      PlotPunchcard( punchcard.tbl
-                   , is.show.diff  = opt$show_diff
-                   , is.show.edits = opt$show_edits
-                   )
-    }
-  )
-  StorePunchcardPlot(punchcard.plot)
+  n <- opt$n_top_committers
+  punchcard.tbl.top.n <-
+    punchcard.tbl[punchcard.tbl$Name %in% GetTopCommitters(log.data, n), ]
+
+  punchcard.plots <- PlotPunchcards(punchcard.tbl, punchcard.tbl.top.n)
+  StorePunchcardPlots(punchcard.plots, n)
 }
 
 
