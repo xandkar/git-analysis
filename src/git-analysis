@@ -37,9 +37,14 @@ ParseTimestamps <- function(timestamps) {
   components <- matrix(unlist(strsplit(timestamps, " +")), ncol=6, byrow=TRUE)
   days       <- components[, 1]
   times      <- components[, 4]
-  hours      <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)[, 1]
-  list( days  = days
-      , hours = as.numeric(hours)
+  times      <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)
+  hours      <- as.numeric(times[, 1])
+
+  all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
+  all.hours <- 0:23
+
+  list( days  = factor(days , levels = all.days)
+      , hours = factor(hours, levels = all.hours)
       )
 }
 
@@ -129,11 +134,8 @@ ParseLog <- function(lines) {
   log.data  <- matrix(unlist(commit.fields), ncol=num.of.commit.fields, byrow=T)
   log.times <- ParseTimestamps(log.data[, 1])
 
-  all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
-  all.hours <- 0:23
-
-  data.frame( Day  = factor(log.times$days , levels=all.days)
-            , Hour = factor(log.times$hours, levels=all.hours)
+  data.frame( Day  = log.times$days
+            , Hour = log.times$hours
             , Name = factor(log.data[, 2])
             , Hash = log.data[, 3]
             , Insertions = as.numeric(log.data[, 4])
