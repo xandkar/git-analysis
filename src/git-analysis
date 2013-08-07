@@ -134,10 +134,10 @@ ParseLog <- function(lines) {
   log.data  <- matrix(unlist(commit.fields), ncol=num.of.commit.fields, byrow=T)
   log.times <- ParseTimestamps(log.data[, 1])
 
-  data.frame( Day  = log.times$days
-            , Hour = log.times$hours
-            , Name = log.data[, 2]
-            , Hash = log.data[, 3]
+  data.frame( Day        = log.times$days
+            , Hour       = log.times$hours
+            , Name       =            log.data[, 2]
+            , Hash       =            log.data[, 3]
             , Insertions = as.numeric(log.data[, 4])
             , Deletions  = as.numeric(log.data[, 5])
             )
