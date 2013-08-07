@@ -54,9 +54,10 @@ DashesToZeros <- function(v) {
 }
 
 
-CommitFlatten <- function(commit) {
+ParseCommit <- function(commit) {
   len <- length(commit)
   head <- commit[1]
+  head.components <- unlist(strsplit(head, "\\|"))
   edits <- (
     if (len > 1) {
       edits <- commit[2:len]
@@ -74,14 +75,23 @@ CommitFlatten <- function(commit) {
 
   if (length(edits) > 0) {
     edits <- matrix(unlist(strsplit(edits, "\t")), ncol=3, byrow=TRUE)
-    insertions <- as.numeric(DashesToZeros(edits[, 1]))
-    deletions  <- as.numeric(DashesToZeros(edits[, 2]))
-    total.insertions <- sum(insertions)
-    total.deletions  <- sum(deletions)
 
-    paste(c(head, total.insertions, total.deletions), collapse="|")
+    edit.insertions <- as.numeric(DashesToZeros(edits[, 1]))
+    edit.deletions  <- as.numeric(DashesToZeros(edits[, 2]))
+    edit.filename   <-                          edits[, 2]
+
+    total.insertions <- sum(edit.insertions)
+    total.deletions  <- sum(edit.deletions)
+
+    c( head.components
+     , total.insertions
+     , total.deletions
+     )
   } else {
-    paste(c(head, 0, 0), collapse="|")
+    c( head.components
+     , 0
+     , 0
+     )
   }
 }
 
@@ -118,20 +128,22 @@ ParseLog <- function(lines) {
   #   -\t-\tbin/blob
   #   2\t4\tsrc/foo_year.erl
   #
-  # Will be extracted as:
-  #   Tue Nov 6 21:28:48 2012 -0500|Jeff Lebowski|550829ec241af50979f6a131dc864830681ac99d|1|7
-  #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak|d140fd203486725c3eb377c43b7b5e9bb382d9cd|2|4
+  # Will be parsed as vector per commit:
+  #   [1] "Tue Nov 6 21:28:48 2012 -0500"
+  #   [2] "Jeff Lebowski"
+  #   [3] "550829ec241af50979f6a131dc864830681ac99d"
+  #   [4] "0"
+  #   [5] "0"
 
   num.of.commit.fields <- 5
 
-  commits <- unlist(lapply(ExtractCommits(lines), CommitFlatten))
-  commit.fields <- strsplit(commits, "\\|")
+  commits <- lapply(ExtractCommits(lines), ParseCommit)
 
-  # Drop lines with missing data (most likely names)
-  commit.comps.lengths <- lapply(commit.fields, length)
-  commit.fields <- commit.fields[commit.comps.lengths == num.of.commit.fields]
+  # Drop commits with missing data (most likely names)
+  commit.comps.lengths <- lapply(commits, length)
+  commits <- commits[commit.comps.lengths == num.of.commit.fields]
 
-  commits.table <- matrix( unlist(commit.fields)
+  commits.table <- matrix( unlist(commits)
                          , ncol  = num.of.commit.fields
                          , byrow = TRUE
                          )
