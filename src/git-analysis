@@ -131,8 +131,8 @@ ParseLog <- function(lines) {
   #   [1] "Tue Nov 6 21:28:48 2012 -0500"
   #   [2] "Jeff Lebowski"
   #   [3] "550829ec241af50979f6a131dc864830681ac99d"
-  #   [4] "0"
-  #   [5] "0"
+  #   [4] "15"
+  #   [5] "22"
 
   num.of.commit.fields <- 5
 
