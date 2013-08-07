@@ -99,9 +99,7 @@ ExtractCommits <- function(lines) {
     )
     commit.range.indices[[i]] <- range
   }
-  commits <- lapply(commit.range.indices, function(indices) lines[indices])
-  commits <- lapply(commits, CommitFlatten)
-  unlist(commits)
+  lapply(commit.range.indices, function(indices) lines[indices])
 }
 
 
@@ -121,7 +119,7 @@ ParseLog <- function(lines) {
 
   num.of.commit.fields <- 5
 
-  commits       <- ExtractCommits(lines)
+  commits <- unlist(lapply(ExtractCommits(lines), CommitFlatten))
   commit.fields <- strsplit(commits, "\\|")
 
   # Drop lines with missing data (most likely names)
