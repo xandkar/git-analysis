@@ -78,7 +78,6 @@ ParseCommit <- function(commit) {
 
     edit.insertions <- as.numeric(DashesToZeros(edits[, 1]))
     edit.deletions  <- as.numeric(DashesToZeros(edits[, 2]))
-    edit.filename   <-                          edits[, 2]
 
     total.insertions <- sum(edit.insertions)
     total.deletions  <- sum(edit.deletions)
