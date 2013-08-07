@@ -49,12 +49,12 @@ DashesToZeros <- function(v) {
 }
 
 
-MsgFlatten <- function(msg) {
-  len <- length(msg)
-  head <- msg[1]
+CommitFlatten <- function(commit) {
+  len <- length(commit)
+  head <- commit[1]
   edits <- (
     if (len > 1) {
-      edits <- msg[2:len]
+      edits <- commit[2:len]
       edits.indices.double.checked <- grep("^(\\d+|-)\t(\\d+|-)\t.+", edits)
       if (length(edits) == length(edits.indices.double.checked)) {
         edits
@@ -81,27 +81,27 @@ MsgFlatten <- function(msg) {
 }
 
 
-ExtractMsgs <- function(lines) {
-  msg.start.indices <-
+ExtractCommits <- function(lines) {
+  commit.start.indices <-
     grep("^[A-Z]{1}[a-z]{2} [A-Z]{1}[a-z]{2} \\d{1,2} \\d{2}:\\d{2}:\\d{2} \\d+ [+-]\\d{4}"
         , lines
         )
-  msg.range.indices <- list()
-  num.msgs  <- length(msg.start.indices)
+  commit.range.indices <- list()
+  num.commits  <- length(commit.start.indices)
   num.lines <- length(lines)
-  for (i in 1:num.msgs) {
+  for (i in 1:num.commits) {
     range <- (
-      if (i == num.msgs) {
-        msg.start.indices[i]:num.lines
+      if (i == num.commits) {
+        commit.start.indices[i]:num.lines
       } else {
-        msg.start.indices[i]:(msg.start.indices[i+1] - 1)
+        commit.start.indices[i]:(commit.start.indices[i+1] - 1)
       }
     )
-    msg.range.indices[[i]] <- range
+    commit.range.indices[[i]] <- range
   }
-  msgs <- lapply(msg.range.indices, function(indices) lines[indices])
-  msgs <- lapply(msgs, MsgFlatten)
-  unlist(msgs)
+  commits <- lapply(commit.range.indices, function(indices) lines[indices])
+  commits <- lapply(commits, CommitFlatten)
+  unlist(commits)
 }
 
 
@@ -119,16 +119,16 @@ ParseLog <- function(lines) {
   #   Tue Nov 6 21:28:48 2012 -0500|Jeff Lebowski|550829ec241af50979f6a131dc864830681ac99d|1|7
   #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak|d140fd203486725c3eb377c43b7b5e9bb382d9cd|2|4
 
-  number.of.msg.fields <- 5
+  num.of.commit.fields <- 5
 
-  msgs       <- ExtractMsgs(lines)
-  msg.fields <- strsplit(msgs, "\\|")
+  commits       <- ExtractCommits(lines)
+  commit.fields <- strsplit(commits, "\\|")
 
   # Drop lines with missing data (most likely names)
-  msg.comps.lengths <- lapply(msg.fields, length)
-  msg.fields <- msg.fields[msg.comps.lengths == number.of.msg.fields]
+  commit.comps.lengths <- lapply(commit.fields, length)
+  commit.fields <- commit.fields[commit.comps.lengths == num.of.commit.fields]
 
-  log.data  <- matrix(unlist(msg.fields), ncol=number.of.msg.fields, byrow=T)
+  log.data  <- matrix(unlist(commit.fields), ncol=num.of.commit.fields, byrow=T)
   log.times <- ParseTimestamps(log.data[, 1])
 
   all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
