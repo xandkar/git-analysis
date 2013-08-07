@@ -131,13 +131,16 @@ ParseLog <- function(lines) {
   commit.comps.lengths <- lapply(commit.fields, length)
   commit.fields <- commit.fields[commit.comps.lengths == num.of.commit.fields]
 
-  log.data <- matrix(unlist(commit.fields), ncol=num.of.commit.fields, byrow=T)
+  commits.table <- matrix( unlist(commit.fields)
+                         , ncol  = num.of.commit.fields
+                         , byrow = TRUE
+                         )
 
-  column.timestamps <- log.data[, 1]
-  column.name       <- log.data[, 2]
-  column.hash       <- log.data[, 3]
-  column.insertions <- log.data[, 4]
-  column.deletions  <- log.data[, 5]
+  column.timestamps <- commits.table[, 1]
+  column.name       <- commits.table[, 2]
+  column.hash       <- commits.table[, 3]
+  column.insertions <- commits.table[, 4]
+  column.deletions  <- commits.table[, 5]
 
   time.components <- ParseTimestamps(column.timestamps)
 
