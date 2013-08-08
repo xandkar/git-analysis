@@ -205,26 +205,24 @@ FetchLog <- function() {
 }
 
 
-StoreRaw <- function(lines, name) {
-  data.file.type   <- "raw"
+FilePath <- function(type, name, format) {
+  data.file.type   <- type
   data.file.name   <- name
-  data.file.format <- "dat"
+  data.file.format <- format
   filename <- paste(data.file.type, data.file.name, sep="-")
   filename <- paste(filename, data.file.format, sep=".")
-  filepath <- file.path(kDataDir, filename)
-  writeLines(lines, filepath)
+  file.path(kDataDir, filename)
+}
+
+
+StoreRaw <- function(lines, name) {
+  writeLines(lines, FilePath(type="raw", name=name, format="dat"))
 }
 
 
 StoreTable <- function(data, name) {
-  data.file.type   <- "table"
-  data.file.name   <- name
-  data.file.format <- "csv"
-  filename <- paste(data.file.type, data.file.name, sep="-")
-  filename <- paste(filename, data.file.format, sep=".")
-  filepath <- file.path(kDataDir, filename)
   write.csv( data
-           , file      = filepath
+           , file      = FilePath(type="table", name=name, format="csv")
            , row.names = FALSE
            )
 }
@@ -241,13 +239,7 @@ StoreTablePunchcard <- function(df) {
 
 
 StorePlot <- function(plot, name) {
-  data.file.type   <- "plot"
-  data.file.name   <- name
-  data.file.format <- "png"
-  filename <- paste(data.file.type, data.file.name, sep="-")
-  filename <- paste(filename, data.file.format, sep=".")
-  filepath <- file.path(kDataDir, filename)
-  ggplot2::ggsave( filename = filepath
+  ggplot2::ggsave( filename = FilePath(type="plot", name=name, format="png")
                  , plot     = plot
                  , width    = 10
                  , height   = 5
