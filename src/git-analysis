@@ -149,14 +149,9 @@ LookupEdits <- function(punchcard.row, commits.tbl) {
 }
 
 
-CountFrequencyOfCommits <- function(commits.tbl) {
-  commits.tbl <- commits.tbl[, c("Day", "Hour", "Name")]
-  as.data.frame(table(commits.tbl))
-}
-
-
 PunchCard <- function(commits.tbl) {
-  punchcard.tbl <- CountFrequencyOfCommits(commits.tbl)
+  punchcard.tbl <- table(commits.tbl[, c("Day", "Hour", "Name")])
+  punchcard.tbl <- as.data.frame(punchcard.tbl)
 
   # The following call to "apply" was 84% of the cost, accodrding to Rprof
   edits <- apply(punchcard.tbl, 1, LookupEdits, commits.tbl)
