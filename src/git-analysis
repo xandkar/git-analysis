@@ -25,6 +25,8 @@
 #
 
 kDataDir <- ".git-analysis"
+kAllDays  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
+kAllHours <- 0:23
 
 
 ParseTimestamps <- function(timestamps) {
@@ -40,11 +42,8 @@ ParseTimestamps <- function(timestamps) {
   times      <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)
   hours      <- as.numeric(times[, 1])
 
-  all.days  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
-  all.hours <- 0:23
-
-  list( days  = factor(days , levels = all.days)
-      , hours = factor(hours, levels = all.hours)
+  list( days  = factor(days , levels = kAllDays)
+      , hours = factor(hours, levels = kAllHours)
       )
 }
 
