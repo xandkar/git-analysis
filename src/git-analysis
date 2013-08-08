@@ -138,18 +138,18 @@ GetTopCommitters <- function(data, n=4) {
 }
 
 
-CountFrequencyOfCommits <- function(commit.tbl) {
+CountFrequencyOfCommits <- function(commits.tbl) {
   # Select Day, Hour and Name columns
-  commit.tbl <- commit.tbl[, c(2, 3, 4)]
-  as.data.frame(table(commit.tbl))
+  commits.tbl <- commits.tbl[, c(2, 3, 4)]
+  as.data.frame(table(commits.tbl))
 }
 
 
-PunchCard <- function(commit.tbl) {
-  punchcard.tbl <- CountFrequencyOfCommits(commit.tbl)
+PunchCard <- function(commits.tbl) {
+  punchcard.tbl <- CountFrequencyOfCommits(commits.tbl)
 
   # The following call to "apply" was 84% of the cost, accodrding to Rprof
-  edits <- apply(punchcard.tbl, 1, LookupEdits, commit.tbl)
+  edits <- apply(punchcard.tbl, 1, LookupEdits, commits.tbl)
 
   insertions <- edits[1, ]
   deletions  <- edits[2, ]
@@ -188,15 +188,15 @@ PlotPunchcards <- function(data.all, data.top.n) {
 }
 
 
-LookupEdits <- function(punchcard.row, commits.log) {
-  commits.log <- commits.log[ commits.log$Day  == punchcard.row["Day"]
-                            & commits.log$Hour == punchcard.row["Hour"]
-                            & commits.log$Name == punchcard.row["Name"]
+LookupEdits <- function(punchcard.row, commits.tbl) {
+  commits.tbl <- commits.tbl[ commits.tbl$Day  == punchcard.row["Day"]
+                            & commits.tbl$Hour == punchcard.row["Hour"]
+                            & commits.tbl$Name == punchcard.row["Name"]
                             ,
                             ]
-  if (nrow(commits.log) > 0) {
-    c( sum(commits.log$TotalInsertions)
-     , sum(commits.log$TotalDeletions)
+  if (nrow(commits.tbl) > 0) {
+    c( sum(commits.tbl$TotalInsertions)
+     , sum(commits.tbl$TotalDeletions)
      )
   } else {
     c(0, 0)
@@ -315,15 +315,15 @@ Main <- function() {
 
   commits.log <- ParseLog(log.lines)
 
-  commit.tbl <- ConstructTableOfCommits(commits.log)
-  StoreTableCommits(commit.tbl)
+  commits.tbl <- ConstructTableOfCommits(commits.log)
+  StoreTableCommits(commits.tbl)
 
-  punchcard.tbl <- PunchCard(commit.tbl)
+  punchcard.tbl <- PunchCard(commits.tbl)
   StoreTablePunchcard(punchcard.tbl)
 
   n <- opt$n_top_committers
   punchcard.tbl.top.n <-
-    punchcard.tbl[punchcard.tbl$Name %in% GetTopCommitters(commit.tbl, n), ]
+    punchcard.tbl[punchcard.tbl$Name %in% GetTopCommitters(commits.tbl, n), ]
 
   punchcard.plots <- PlotPunchcards(punchcard.tbl, punchcard.tbl.top.n)
   StorePlotsPunchcard(punchcard.plots, n)
