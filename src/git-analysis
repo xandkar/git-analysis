@@ -150,8 +150,7 @@ LookupEdits <- function(punchcard.row, commits.tbl) {
 
 
 CountFrequencyOfCommits <- function(commits.tbl) {
-  # Select Day, Hour and Name columns
-  commits.tbl <- commits.tbl[, c(2, 3, 4)]
+  commits.tbl <- commits.tbl[, c("Day", "Hour", "Name")]
   as.data.frame(table(commits.tbl))
 }
 
