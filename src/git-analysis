@@ -274,14 +274,14 @@ DoInit <- function() {
 
 
 ConstructTableOfCommits <- function(commits.log) {
-  log <- commits.log
-  data.frame( Hash            = sapply(log, function(c) c$hash )
-            , Day             = sapply(log, function(c) c$day )
-            , Hour            = sapply(log, function(c) c$hour )
-            , Name            = sapply(log, function(c) c$name )
-            , TotalFiles      = sapply(log, function(c) c$num.files )
-            , TotalInsertions = sapply(log, function(c) c$num.insertions )
-            , TotalDeletions  = sapply(log, function(c) c$num.deletions )
+  commits <- commits.log
+  data.frame( Hash            = sapply(commits, function(c) c$hash )
+            , Day             = sapply(commits, function(c) c$day )
+            , Hour            = sapply(commits, function(c) c$hour )
+            , Name            = sapply(commits, function(c) c$name )
+            , TotalFiles      = sapply(commits, function(c) c$num.files )
+            , TotalInsertions = sapply(commits, function(c) c$num.insertions )
+            , TotalDeletions  = sapply(commits, function(c) c$num.deletions )
             )
 }
 
