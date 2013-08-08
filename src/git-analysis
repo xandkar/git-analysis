@@ -210,38 +210,54 @@ FetchLog <- function() {
 }
 
 
-StoreCSV <- function(lst) {
-  write.csv( lst$data
-           , file      = file.path(kDataDir, lst$filename)
+StoreTable <- function(data, name) {
+  data.file.type   <- "table"
+  data.file.name   <- name
+  data.file.format <- "csv"
+  filename <- paste(data.file.type, data.file.name, sep="-")
+  filename <- paste(filename, data.file.format, sep=".")
+  filepath <- file.path(kDataDir, filename)
+  write.csv( data
+           , file      = filepath
            , row.names = FALSE
            )
 }
 
 
-StoreCommitsTable <- function(df) {
-  StoreCSV(list(data=df, filename="commits-table.csv"))
+StoreTableCommits <- function(df) {
+  StoreTable(data=df, name="commits")
 }
 
 
-StorePunchcardTable <- function(df) {
-  StoreCSV(list(data=df, filename="punchcard.csv"))
+StoreTablePunchcard <- function(df) {
+  StoreTable(data=df, name="punchcard")
 }
 
 
-StorePunchcardPlots <- function(plots, n.committers) {
-  filenames <- names(plots)
-  filenames <- gsub("\\.", "-", filenames)
-  filenames <- sub("-n-", sprintf("-%d-", n.committers), filenames)
-  filenames <- paste("punchcard", filenames, sep="-")
-  filenames <- paste(filenames  , "png"    , sep=".")
+StorePlot <- function(plot, name) {
+  data.file.type   <- "plot"
+  data.file.name   <- name
+  data.file.format <- "png"
+  filename <- paste(data.file.type, data.file.name, sep="-")
+  filename <- paste(filename, data.file.format, sep=".")
+  filepath <- file.path(kDataDir, filename)
+  ggplot2::ggsave( filename = filepath
+                 , plot     = plot
+                 , width    = 10
+                 , height   = 5
+                 )
+}
+
+
+StorePlotsPunchcard <- function(plots, n.committers) {
+  plot.names <- names(plots)
+  plot.names <- gsub("\\.", "-", plot.names)
+  plot.names <- sub("-n-", sprintf("-%d-", n.committers), plot.names)
+  plot.names <- paste("punchcard", plot.names, sep="-")
   len <- length(plots)
   if (len > 0) {
     for (i in 1:len) {
-      ggplot2::ggsave( filename = file.path(kDataDir, filenames[i])
-                     , plot     = plots[[i]]
-                     , width    = 10
-                     , height   = 5
-                     )
+      StorePlot(plots[[i]], plot.names[i])
     }
   }
 }
@@ -284,17 +300,17 @@ Main <- function() {
   opt <- OptParse()
   commits.log <- ParseLog(FetchLog())
   commit.tbl <- CommitsTable(commits.log)
-  StoreCommitsTable(commit.tbl)
+  StoreTableCommits(commit.tbl)
 
   punchcard.tbl <- PunchCard(commit.tbl)
-  StorePunchcardTable(punchcard.tbl)
+  StoreTablePunchcard(punchcard.tbl)
 
   n <- opt$n_top_committers
   punchcard.tbl.top.n <-
     punchcard.tbl[punchcard.tbl$Name %in% GetTopCommitters(commit.tbl, n), ]
 
   punchcard.plots <- PlotPunchcards(punchcard.tbl, punchcard.tbl.top.n)
-  StorePunchcardPlots(punchcard.plots, n)
+  StorePlotsPunchcard(punchcard.plots, n)
 }
 
 
