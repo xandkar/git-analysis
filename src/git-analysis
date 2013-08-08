@@ -29,21 +29,21 @@ kAllDays  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
 kAllHours <- 0:23
 
 
-ParseTimestamps <- function(timestamps) {
+ParseTimestamp <- function(timestamp) {
   # Example timestamp: "Tue Nov 6 21:28:48 2012 -0500"
   #
   # Using relative timestamps literally instead of converting with as.POSIXct,
   # because commits could've been made from several timezones, in which case I
   # think it is more interesting to see the time as perceived by the committer
   # rather than a globally normalized time.
-  components <- matrix(unlist(strsplit(timestamps, " +")), ncol=6, byrow=TRUE)
-  days       <- components[, 1]
-  times      <- components[, 4]
-  times      <- matrix(unlist(strsplit(times, ":")), ncol=3, byrow=TRUE)
-  hours      <- as.numeric(times[, 1])
+  components <- unlist(strsplit(timestamp, " +"))
+  day        <- components[1]
+  time       <- components[4]
+  time       <- unlist(strsplit(time, ":"))
+  hour       <- as.numeric(time[1])
 
-  list( days  = factor(days , levels = kAllDays)
-      , hours = factor(hours, levels = kAllHours)
+  list( day  = factor(day , levels = kAllDays)
+      , hour = factor(hour, levels = kAllHours)
       )
 }
 
@@ -55,8 +55,6 @@ DashesToZeros <- function(v) {
 
 ParseCommit <- function(commit) {
   len <- length(commit)
-  head <- commit[1]
-  head.components <- unlist(strsplit(head, "\\|"))
   edits <- (
     if (len > 1) {
       edits <- commit[2:len]
@@ -72,25 +70,30 @@ ParseCommit <- function(commit) {
     }
   )
 
-  if (length(edits) > 0) {
-    edits <- matrix(unlist(strsplit(edits, "\t")), ncol=3, byrow=TRUE)
+  head <- unlist(strsplit(commit[1], "\\|"))
 
-    edit.insertions <- as.numeric(DashesToZeros(edits[, 1]))
-    edit.deletions  <- as.numeric(DashesToZeros(edits[, 2]))
+  timestamp <- head[1]
+  timestamp <- ParseTimestamp(timestamp)
+  name      <- head[2]
+  hash      <- head[3]
 
-    total.insertions <- sum(edit.insertions)
-    total.deletions  <- sum(edit.deletions)
+  edits <- (
+    if (length(edits) > 0)
+      unlist(strsplit(edits, "\t"))
+    else
+      c(0, 0, "-")
+  )
+  edits <- matrix(edits, ncol=3, byrow=TRUE)
 
-    c( head.components
-     , total.insertions
-     , total.deletions
-     )
-  } else {
-    c( head.components
-     , 0
-     , 0
-     )
-  }
+  list( hash           = hash
+      , day            = timestamp$day
+      , hour           = timestamp$hour
+      , name           = name
+      , num.files      = nrow(edits)
+      , num.insertions = sum(as.numeric(DashesToZeros(edits[, 1])))
+      , num.deletions  = sum(as.numeric(DashesToZeros(edits[, 2])))
+      , edits          = edits
+      )
 }
 
 
@@ -125,42 +128,8 @@ ParseLog <- function(lines) {
   #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak|d140fd203486725c3eb377c43b7b5e9bb382d9cd
   #   -\t-\tbin/blob
   #   2\t4\tsrc/foo_year.erl
-  #
-  # Will be parsed as vector per commit:
-  #   [1] "Tue Nov 6 21:28:48 2012 -0500"
-  #   [2] "Jeff Lebowski"
-  #   [3] "550829ec241af50979f6a131dc864830681ac99d"
-  #   [4] "15"
-  #   [5] "22"
 
-  num.of.commit.fields <- 5
-
-  commits <- lapply(ExtractCommits(lines), ParseCommit)
-
-  # Drop commits with missing data (most likely names)
-  commit.comps.lengths <- lapply(commits, length)
-  commits <- commits[commit.comps.lengths == num.of.commit.fields]
-
-  commits.table <- matrix( unlist(commits)
-                         , ncol  = num.of.commit.fields
-                         , byrow = TRUE
-                         )
-
-  column.timestamps <- commits.table[, 1]
-  column.name       <- commits.table[, 2]
-  column.hash       <- commits.table[, 3]
-  column.insertions <- commits.table[, 4]
-  column.deletions  <- commits.table[, 5]
-
-  time.components <- ParseTimestamps(column.timestamps)
-
-  data.frame( Day        = time.components$days
-            , Hour       = time.components$hours
-            , Name       =            column.name
-            , Hash       =            column.hash
-            , Insertions = as.numeric(column.insertions)
-            , Deletions  = as.numeric(column.deletions)
-            )
+  lapply(ExtractCommits(lines), ParseCommit)
 }
 
 
@@ -169,12 +138,18 @@ GetTopCommitters <- function(data, n=4) {
 }
 
 
-CountFrequencyOfCommits <- function(log) {
-  # Leave-out edits and hash columns from frquency count
-  punchcard.tbl <- as.data.frame(table(log[, 1:3]))
+CountFrequencyOfCommits <- function(commit.tbl) {
+  # Select Day, Hour and Name columns
+  commit.tbl <- commit.tbl[, c(2, 3, 4)]
+  as.data.frame(table(commit.tbl))
+}
+
+
+PunchCard <- function(commit.tbl) {
+  punchcard.tbl <- CountFrequencyOfCommits(commit.tbl)
 
   # The following call to "apply" was 84% of the cost, accodrding to Rprof
-  edits <- apply(punchcard.tbl, 1, LookupEdits, log)
+  edits <- apply(punchcard.tbl, 1, LookupEdits, commit.tbl)
 
   insertions <- edits[1, ]
   deletions  <- edits[2, ]
@@ -213,15 +188,15 @@ PlotPunchcards <- function(data.all, data.top.n) {
 }
 
 
-LookupEdits <- function(tbl.row, log.data) {
-  log.data <- log.data[ log.data$Day  == tbl.row[1]
-                      & log.data$Hour == tbl.row[2]
-                      & log.data$Name == tbl.row[3]
-                      ,
-                      ]
-  if (nrow(log.data) > 0) {
-    c( sum(log.data$Insertions)
-     , sum(log.data$Deletions)
+LookupEdits <- function(punchcard.row, commits.log) {
+  commits.log <- commits.log[ commits.log$Day  == punchcard.row["Day"]
+                            & commits.log$Hour == punchcard.row["Hour"]
+                            & commits.log$Name == punchcard.row["Name"]
+                            ,
+                            ]
+  if (nrow(commits.log) > 0) {
+    c( sum(commits.log$TotalInsertions)
+     , sum(commits.log$TotalDeletions)
      )
   } else {
     c(0, 0)
@@ -243,8 +218,8 @@ StoreCSV <- function(lst) {
 }
 
 
-StoreLog <- function(df) {
-  StoreCSV(list(data=df, filename="log.csv"))
+StoreCommitsTable <- function(df) {
+  StoreCSV(list(data=df, filename="commits-table.csv"))
 }
 
 
@@ -290,20 +265,33 @@ DoInit <- function() {
 }
 
 
+CommitsTable <- function(commits.log) {
+  log <- commits.log
+  u <- unlist
+  data.frame( Hash            = u(lapply(log, function(c) c$hash ))
+            , Day             = u(lapply(log, function(c) c$day ))
+            , Hour            = u(lapply(log, function(c) c$hour ))
+            , Name            = u(lapply(log, function(c) c$name ))
+            , TotalFiles      = u(lapply(log, function(c) c$num.files ))
+            , TotalInsertions = u(lapply(log, function(c) c$num.insertions ))
+            , TotalDeletions  = u(lapply(log, function(c) c$num.deletions ))
+            )
+}
+
+
 Main <- function() {
   DoInit()
-
   opt <- OptParse()
+  commits.log <- ParseLog(FetchLog())
+  commit.tbl <- CommitsTable(commits.log)
+  StoreCommitsTable(commit.tbl)
 
-  log.data <- ParseLog(FetchLog())
-  StoreLog(log.data)
-
-  punchcard.tbl <- CountFrequencyOfCommits(log.data)
+  punchcard.tbl <- PunchCard(commit.tbl)
   StorePunchcardTable(punchcard.tbl)
 
   n <- opt$n_top_committers
   punchcard.tbl.top.n <-
-    punchcard.tbl[punchcard.tbl$Name %in% GetTopCommitters(log.data, n), ]
+    punchcard.tbl[punchcard.tbl$Name %in% GetTopCommitters(commit.tbl, n), ]
 
   punchcard.plots <- PlotPunchcards(punchcard.tbl, punchcard.tbl.top.n)
   StorePunchcardPlots(punchcard.plots, n)
