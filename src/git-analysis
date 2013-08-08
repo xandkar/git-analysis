@@ -210,6 +210,17 @@ FetchLog <- function() {
 }
 
 
+StoreRaw <- function(lines, name) {
+  data.file.type   <- "raw"
+  data.file.name   <- name
+  data.file.format <- "dat"
+  filename <- paste(data.file.type, data.file.name, sep="-")
+  filename <- paste(filename, data.file.format, sep=".")
+  filepath <- file.path(kDataDir, filename)
+  writeLines(lines, filepath)
+}
+
+
 StoreTable <- function(data, name) {
   data.file.type   <- "table"
   data.file.name   <- name
@@ -298,7 +309,12 @@ CommitsTable <- function(commits.log) {
 Main <- function() {
   DoInit()
   opt <- OptParse()
-  commits.log <- ParseLog(FetchLog())
+
+  log.lines <- FetchLog()
+  StoreRaw(log.lines, "log")
+
+  commits.log <- ParseLog(log.lines)
+
   commit.tbl <- CommitsTable(commits.log)
   StoreTableCommits(commit.tbl)
 
