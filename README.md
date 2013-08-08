@@ -13,21 +13,23 @@ $ cd otp
 $ time git-analysis -n 4
 110.97s user 0.42s system 99% cpu 1:51.48 total
 $ ls -1 .git-analysis
-log.csv
-punchcard-all-diff.png
-punchcard-all-edits.png
-punchcard-all.png
-punchcard.csv
-punchcard-top-4-committers-diff.png
-punchcard-top-4-committers-edits.png
-punchcard-top-4-committers.png
+plot-punchcard-all-diff.png
+plot-punchcard-all-edits.png
+plot-punchcard-all.png
+plot-punchcard-top-4-committers-diff.png
+plot-punchcard-top-4-committers-edits.png
+plot-punchcard-top-4-committers.png
+raw-log.dat
+table-commits.csv
+table-punchcard.csv
 ```
 
-`punchcard-top.4.committers.edits.png`: punch holes color-scaled by total edits
+`plot-punchcard-top.4.committers.edits.png`: punch holes color-scaled by total
+edits
 (insertions + deletions)
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-edits.png)
 
-`punchcard-top.4.committers.diff.png`: punch holes color-scaled by diff
+`plot-punchcard-top.4.committers.diff.png`: punch holes color-scaled by diff
 proportions (insertions - deletions):
 ![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-diff.png)
 
