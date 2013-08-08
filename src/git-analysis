@@ -133,8 +133,19 @@ ParseLog <- function(lines) {
 }
 
 
-GetTopCommitters <- function(data, n=4) {
-  names(sort(table(data$Name), decreasing=TRUE))[1:n]
+LookupEdits <- function(punchcard.row, commits.tbl) {
+  commits.tbl <- commits.tbl[ commits.tbl$Day  == punchcard.row["Day"]
+                            & commits.tbl$Hour == punchcard.row["Hour"]
+                            & commits.tbl$Name == punchcard.row["Name"]
+                            ,
+                            ]
+  if (nrow(commits.tbl) > 0) {
+    c( sum(commits.tbl$TotalInsertions)
+     , sum(commits.tbl$TotalDeletions)
+     )
+  } else {
+    c(0, 0)
+  }
 }
 
 
@@ -185,22 +196,6 @@ PlotPunchcards <- function(data.all, data.top.n) {
       , top.n.committers.edits = plot.top.n + color.edits
       , top.n.committers.diff  = plot.top.n + color.diff
       )
-}
-
-
-LookupEdits <- function(punchcard.row, commits.tbl) {
-  commits.tbl <- commits.tbl[ commits.tbl$Day  == punchcard.row["Day"]
-                            & commits.tbl$Hour == punchcard.row["Hour"]
-                            & commits.tbl$Name == punchcard.row["Name"]
-                            ,
-                            ]
-  if (nrow(commits.tbl) > 0) {
-    c( sum(commits.tbl$TotalInsertions)
-     , sum(commits.tbl$TotalDeletions)
-     )
-  } else {
-    c(0, 0)
-  }
 }
 
 
@@ -303,6 +298,11 @@ ConstructTableOfCommits <- function(commits.log) {
             , TotalInsertions = u(lapply(log, function(c) c$num.insertions ))
             , TotalDeletions  = u(lapply(log, function(c) c$num.deletions ))
             )
+}
+
+
+GetTopCommitters <- function(commits.tbl, n=4) {
+  names(sort(table(commits.tbl$Name), decreasing=TRUE))[1:n]
 }
 
 
