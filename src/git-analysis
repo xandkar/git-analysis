@@ -292,7 +292,7 @@ DoInit <- function() {
 }
 
 
-CommitsTable <- function(commits.log) {
+ConstructTableOfCommits <- function(commits.log) {
   log <- commits.log
   u <- unlist
   data.frame( Hash            = u(lapply(log, function(c) c$hash ))
@@ -315,7 +315,7 @@ Main <- function() {
 
   commits.log <- ParseLog(log.lines)
 
-  commit.tbl <- CommitsTable(commits.log)
+  commit.tbl <- ConstructTableOfCommits(commits.log)
   StoreTableCommits(commit.tbl)
 
   punchcard.tbl <- PunchCard(commit.tbl)
