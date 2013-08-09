@@ -350,17 +350,16 @@ Main <- function() {
   commits.tbl <- ConstructTableOfCommits(commits.log)
   StoreTableCommits(commits.tbl)
 
-  punchcard.tbl <- PunchCard(commits.tbl)
-  StoreTablePunchcard(punchcard.tbl)
-
   top.n.commiters <- GetTopCommitters(commits.tbl, opt$n_top_committers)
-  punchcard.tbl.top.n <-
-    punchcard.tbl[punchcard.tbl$Name %in% top.n.commiters, ]
+
+  punchcard.tbl       <- PunchCard(commits.tbl)
+  punchcard.tbl.top.n <- punchcard.tbl[punchcard.tbl$Name %in% top.n.commiters, ]
+  StoreTablePunchcard(punchcard.tbl)
 
   punchcard.plots <- PlotPunchcards(punchcard.tbl, punchcard.tbl.top.n)
   StorePlotsPunchcard(punchcard.plots, opt$n_top_committers)
 
-  commits.tbl <- commits.tbl[commits.tbl$Name %in% top.n.commiters, ]
+  commits.tbl.top.n <- commits.tbl[commits.tbl$Name %in% top.n.commiters, ]
   plots.distributions <- PlotDistributions(commits.tbl, bin=opt$bin)
   StorePlotsDistributions(plots.distributions)
 }
