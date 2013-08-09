@@ -181,8 +181,7 @@ PlotDistributions <- function(commits.tbl, bin) {
      )
   distribution.edits.per.commit <-
     ( ggplot2::ggplot(rbind(deletions, insertions))
-    + ggplot2::aes(x=EditSize)
-    + ggplot2::aes(color=EditType, fill=EditType)
+    + ggplot2::aes(x=EditSize, color=EditType, fill=EditType)
     + ggplot2::facet_wrap(~ Name, ncol=2, scales="free")
     + ggplot2::scale_fill_manual(values=color.assignmnets)
     + ggplot2::scale_colour_manual(values=color.assignmnets)
