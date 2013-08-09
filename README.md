@@ -37,6 +37,7 @@ proportions (insertions - deletions):
 TODO
 ----
 * Optionally reuse parsed data instead of re-parsing on each run
+* Consider replacing (slow) ggplot2 with (much faster) lattice
 
 
 Ideas
