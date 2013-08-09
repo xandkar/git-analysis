@@ -13,6 +13,8 @@ $ cd otp
 $ time git-analysis -n 4
 110.97s user 0.42s system 99% cpu 1:51.48 total
 $ ls -1 .git-analysis
+plot-distribution-edits-per-commit-hist.png
+plot-distribution-edits-per-commit-kde.png
 plot-punchcard-all-diff.png
 plot-punchcard-all-edits.png
 plot-punchcard-all.png
