@@ -195,7 +195,7 @@ PlotDistributions <- function(commits.tbl, bin) {
 }
 
 
-PlotPunchcards <- function(commits.tbl, commits.tbl.top.n) {
+PlotPunchcards <- function(punchcard.tbl, punchcard.tbl.top.n) {
   axis <- ggplot2::aes(y=Day, x=Hour)
   geom <-
     list( ggplot2::geom_point(ggplot2::aes(size=Freq))
@@ -210,8 +210,8 @@ PlotPunchcards <- function(commits.tbl, commits.tbl.top.n) {
                                            )
           )
 
-  plot.all   <- ggplot2::ggplot(commits.tbl)       + axis + geom
-  plot.top.n <- ggplot2::ggplot(commits.tbl.top.n) + axis + geom + facets.names
+  plot.all   <- ggplot2::ggplot(punchcard.tbl)       + axis + geom
+  plot.top.n <- ggplot2::ggplot(punchcard.tbl.top.n) + axis + geom + facets.names
 
   list( all                    = plot.all
       , all.edits              = plot.all   + color.edits
