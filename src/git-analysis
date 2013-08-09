@@ -361,7 +361,7 @@ Main <- function() {
   StorePlotsPunchcard(punchcard.plots, opt$n_top_committers)
 
   commits.tbl.top.n <- commits.tbl[commits.tbl$Name %in% top.n.commiters, ]
-  plots.distributions <- PlotDistributions(commits.tbl, bin=opt$bin)
+  plots.distributions <- PlotDistributions(commits.tbl.top.n, bin=opt$bin)
   StorePlotsDistributions(plots.distributions)
 }
 
