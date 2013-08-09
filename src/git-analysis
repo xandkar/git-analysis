@@ -182,14 +182,23 @@ PlotDistributions <- function(commits.tbl, bin) {
   distribution.edits.per.commit <-
     ( ggplot2::ggplot(rbind(deletions, insertions))
     + ggplot2::aes(x=EditSize)
-    + ggplot2::geom_histogram(binwidth=bin, alpha=0.4)
     + ggplot2::aes(color=EditType, fill=EditType)
     + ggplot2::facet_wrap(~ Name, ncol=2, scales="free")
     + ggplot2::scale_fill_manual(values=color.assignmnets)
     + ggplot2::scale_colour_manual(values=color.assignmnets)
     )
+  distribution.edits.per.commit.hist <-
+    ( distribution.edits.per.commit
+    + ggplot2::geom_histogram(binwidth=bin, alpha=0.4)
+    )
+  distribution.edits.per.commit.kde <-
+    ( distribution.edits.per.commit
+    + ggplot2::geom_density(binwidth=bin, alpha=0.4)
+    )
 
-  list(edits.per.commit=distribution.edits.per.commit)
+  list( edits.per.commit.hist = distribution.edits.per.commit.hist
+      , edits.per.commit.kde  = distribution.edits.per.commit.kde
+      )
 }
 
 
