@@ -165,6 +165,36 @@ PunchCard <- function(commits.tbl) {
 }
 
 
+PlotDistributions <- function(commits.tbl, bin) {
+  edit.types <- c("Insertion", "Deletion")
+  insertions <- data.frame( Name     = commits.tbl$Name
+                          , EditSize = commits.tbl$TotalInsertions
+                          , EditType = factor("Insertion", levels=edit.types)
+                          )
+  deletions <- data.frame( Name     = commits.tbl$Name
+                         , EditSize = commits.tbl$TotalDeletions
+                         , EditType = factor("Deletion", levels=edit.types)
+                         )
+  distribution.edits.per.commit <-
+    ( ggplot2::ggplot(rbind(deletions, insertions))
+    + ggplot2::aes(x=EditSize)
+    + ggplot2::geom_histogram(binwidth=bin, alpha=0.4)
+    + ggplot2::aes(color=EditType, fill=EditType)
+    + ggplot2::facet_wrap(~ Name, ncol=2, scales="free")
+    + ggplot2::scale_fill_manual( values = c( "Insertion" = scales::muted("green")
+                                            , "Deletion"  = scales::muted("red")
+                                            )
+                                )
+    + ggplot2::scale_colour_manual( values = c( "Insertion" = scales::muted("green")
+                                              , "Deletion"  = scales::muted("red")
+                                              )
+                                  )
+    )
+
+  list(edits.per.commit=distribution.edits.per.commit)
+}
+
+
 PlotPunchcards <- function(commits.tbl, commits.tbl.top.n) {
   axis <- ggplot2::aes(y=Day, x=Hour)
   geom <-
@@ -241,6 +271,19 @@ StorePlot <- function(plot, name) {
 }
 
 
+StorePlotsDistributions <- function(plots) {
+  plot.names <- names(plots)
+  plot.names <- gsub("\\.", "-", plot.names)
+  plot.names <- paste("distribution", plot.names, sep="-")
+  len <- length(plots)
+  if (len > 0) {
+    for (i in 1:len) {
+      StorePlot(plots[[i]], plot.names[i])
+    }
+  }
+}
+
+
 StorePlotsPunchcard <- function(plots, n.committers) {
   plot.names <- names(plots)
   plot.names <- gsub("\\.", "-", plot.names)
@@ -260,6 +303,10 @@ OptParse <- function() {
     list( optparse::make_option( c("-n", "--n_top_committers")
                                , type    = "integer"
                                , default = 4
+                               )
+        , optparse::make_option( c("-b", "--bin_width")
+                               , type    = "integer"
+                               , default = 50
                                )
         )
   optparse::parse_args(optparse::OptionParser(option_list=options))
@@ -306,12 +353,16 @@ Main <- function() {
   punchcard.tbl <- PunchCard(commits.tbl)
   StoreTablePunchcard(punchcard.tbl)
 
-  n <- opt$n_top_committers
+  top.n.commiters <- GetTopCommitters(commits.tbl, opt$n_top_committers)
   punchcard.tbl.top.n <-
-    punchcard.tbl[punchcard.tbl$Name %in% GetTopCommitters(commits.tbl, n), ]
+    punchcard.tbl[punchcard.tbl$Name %in% top.n.commiters, ]
 
   punchcard.plots <- PlotPunchcards(punchcard.tbl, punchcard.tbl.top.n)
-  StorePlotsPunchcard(punchcard.plots, n)
+  StorePlotsPunchcard(punchcard.plots, opt$n_top_committers)
+
+  commits.tbl <- commits.tbl[commits.tbl$Name %in% top.n.commiters, ]
+  plots.distributions <- PlotDistributions(commits.tbl, bin=opt$bin)
+  StorePlotsDistributions(plots.distributions)
 }
 
 
