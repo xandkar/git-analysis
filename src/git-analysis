@@ -175,20 +175,18 @@ PlotDistributions <- function(commits.tbl, bin) {
                          , EditSize = commits.tbl$TotalDeletions
                          , EditType = factor("Deletion", levels=edit.types)
                          )
+  color.assignmnets <-
+    c( "Insertion" = scales::muted("green")
+     , "Deletion"  = scales::muted("red")
+     )
   distribution.edits.per.commit <-
     ( ggplot2::ggplot(rbind(deletions, insertions))
     + ggplot2::aes(x=EditSize)
     + ggplot2::geom_histogram(binwidth=bin, alpha=0.4)
     + ggplot2::aes(color=EditType, fill=EditType)
     + ggplot2::facet_wrap(~ Name, ncol=2, scales="free")
-    + ggplot2::scale_fill_manual( values = c( "Insertion" = scales::muted("green")
-                                            , "Deletion"  = scales::muted("red")
-                                            )
-                                )
-    + ggplot2::scale_colour_manual( values = c( "Insertion" = scales::muted("green")
-                                              , "Deletion"  = scales::muted("red")
-                                              )
-                                  )
+    + ggplot2::scale_fill_manual(values=color.assignmnets)
+    + ggplot2::scale_colour_manual(values=color.assignmnets)
     )
 
   list(edits.per.commit=distribution.edits.per.commit)
