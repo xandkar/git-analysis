@@ -266,6 +266,11 @@ StoreTableCommits <- function(df) {
 }
 
 
+StoreTableEdits <- function(df) {
+  StoreTable(data=df, name="edits")
+}
+
+
 StoreTablePunchcard <- function(df) {
   StoreTable(data=df, name="punchcard")
 }
@@ -329,6 +334,27 @@ DoInit <- function() {
 }
 
 
+ConstructTableOfEdits <- function(commits.log) {
+  EditsOfCommit <- function(commit) {
+    as.vector(t(cbind(commit$hash, commit$name, commit$edits)))
+  }
+  edits.vct <- unlist(lapply(commits.log, EditsOfCommit))
+  edits.mtx <- matrix(edits.vct, ncol=5, byrow=TRUE)
+  edits.tbl <- as.data.frame(edits.mtx, stringsAsFactors=FALSE)
+  names(edits.tbl) <- c("Hash", "Name", "Insertions", "Deletions", "Filepath")
+  edits.tbl$Insertions <- as.numeric(DashesToZeros(edits.tbl$Insertions))
+  edits.tbl$Deletions  <- as.numeric(DashesToZeros(edits.tbl$Deletions))
+
+  GetLast <- function(vct) vct[length(vct)]
+  file.paths <- edits.tbl$Filepath
+  file.names <- unlist(lapply(strsplit(file.paths, "/")  , GetLast))
+  file.exts  <- unlist(lapply(strsplit(file.names, "\\."), GetLast))
+
+  edits.tbl$FileExtension <- file.exts
+  edits.tbl
+}
+
+
 ConstructTableOfCommits <- function(commits.log) {
   commits <- commits.log
   data.frame( Hash            = sapply(commits, function(c) c$hash )
@@ -355,6 +381,8 @@ Main <- function() {
   StoreRaw(log.lines, "log")
 
   commits.log <- ParseLog(log.lines)
+  edits.tbl <- ConstructTableOfEdits(commits.log)
+  StoreTableEdits(edits.tbl)
 
   commits.tbl <- ConstructTableOfCommits(commits.log)
   StoreTableCommits(commits.tbl)
