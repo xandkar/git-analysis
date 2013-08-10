@@ -39,6 +39,7 @@ proportions (insertions - deletions):
 
 TODO
 ----
+* Add progress messages with execution times of stages
 * Optionally reuse parsed data instead of re-parsing on each run
 * Consider replacing (slow) ggplot2 with (much faster) lattice
 
