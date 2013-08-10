@@ -251,7 +251,7 @@ FilePath <- function(type, name, format) {
 StoreRaw <- function(lines, name) {
   file.path <- FilePath(type="raw", name=name, format="dat")
   file.path <- paste(file.path, "gz", sep=".")
-  file <- gzfile(file.path, "wb")
+  file <- gzfile(file.path, "wb", compression=9)
   writeLines(lines, file)
   close(file)
 }
@@ -260,7 +260,7 @@ StoreRaw <- function(lines, name) {
 StoreTable <- function(data, name) {
   file.path <- FilePath(type="table", name=name, format="csv")
   file.path <- paste(file.path, "gz", sep=".")
-  file <- gzfile(file.path, "wb")
+  file <- gzfile(file.path, "wb", compression=9)
   write.csv( data
            , file      = file
            , row.names = FALSE
