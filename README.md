@@ -21,9 +21,10 @@ plot-punchcard-all.png
 plot-punchcard-top-4-committers-diff.png
 plot-punchcard-top-4-committers-edits.png
 plot-punchcard-top-4-committers.png
-raw-log.dat
-table-commits.csv
-table-punchcard.csv
+raw-log.dat.gz
+table-commits.csv.gz
+table-edits.csv.gz
+table-punchcard.csv.gz
 ```
 
 `plot-punchcard-top-4-committers-edits.png`: punch holes color-scaled by total
