@@ -41,6 +41,21 @@ TODO
 ----
 * Optionally reuse parsed data instead of re-parsing on each run
 * Consider replacing (slow) ggplot2 with (much faster) lattice
+* Make detailed punchcard optional (since looking-up edits is so expensive)
+* Experiment with less expensive ways to lookup edits for punchcards
+* Construct table of files that are currently present in the repository
+* Classify files into types based on:
+    - extension
+    - shebang line (if present)
+* Determine top N file types
+* Determine top N committers to each file type
+* Determine top N inserters to each file type
+* Determine top N deleters to each file type
+* Determine top N editors to each file type
+* Plots some permutations of the above
+* Cluster committers around filetypes
+* Cluster committers around specific files
+* Determine outlier edits and optionally omit from the above stats
 
 
 Ideas
