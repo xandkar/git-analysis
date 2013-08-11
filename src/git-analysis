@@ -29,6 +29,31 @@ kAllDays  <- c("Sun", "Sat", "Fri", "Thu", "Wed", "Tue", "Mon")
 kAllHours <- 0:23
 
 
+cache <- list()
+
+
+OperationBegin <- function(operation) {
+  cache.name <- "operation.start.times"
+  time.started <- proc.time()
+  cache[[cache.name]][[operation]] <<- time.started
+  msg <- sprintf("STARTED:\t%s", operation)
+  write(msg, stderr())
+}
+
+
+OperationEnd <- function(operation) {
+  cache.name <- "operation.start.times"
+  time.started  <- cache[[cache.name]][[operation]]
+  time.finished <- proc.time()
+  time.delta    <- time.finished - time.started
+  msg <- sprintf( "FINISHED:\t%s\nTIME ELAPSED:\t%f\n"
+                , operation
+                , time.delta["elapsed"]
+                )
+  write(msg, stderr())
+}
+
+
 ParseTimestamp <- function(timestamp) {
   # Example timestamp: "Tue Nov 6 21:28:48 2012 -0500"
   #
@@ -128,8 +153,11 @@ ParseLog <- function(lines) {
   #   Tue Nov 5 17:01:27 2012 -0700|Walter Sobchak|d140fd203486725c3eb377c43b7b5e9bb382d9cd
   #   -\t-\tbin/blob
   #   2\t4\tsrc/foo_year.erl
-
-  lapply(ExtractCommits(lines), ParseCommit)
+  operation <- "parse git commit log"
+  OperationBegin(operation)
+  commits.log <- lapply(ExtractCommits(lines), ParseCommit)
+  OperationEnd(operation)
+  commits.log
 }
 
 
@@ -153,8 +181,11 @@ PunchCard <- function(commits.tbl) {
   punchcard.tbl <- table(commits.tbl[, c("Day", "Hour", "Name")])
   punchcard.tbl <- as.data.frame(punchcard.tbl)
 
+  operation <- "lookup edits per slot in punchard"
+  OperationBegin(operation)
   # The following call to "apply" was 84% of the cost, accodrding to Rprof
   edits <- apply(punchcard.tbl, 1, LookupEdits, commits.tbl)
+  OperationEnd(operation)
 
   insertions <- edits[1, ]
   deletions  <- edits[2, ]
@@ -233,8 +264,12 @@ PlotPunchcards <- function(punchcard.tbl, punchcard.tbl.top.n) {
 
 
 FetchLog <- function() {
+  operation <- "fetch git commit log"
+  OperationBegin(operation)
   command <- "git log --format='%ad|%an|%H' --numstat | grep -v '^$'"
-  system(command, intern=TRUE)
+  log <- system(command, intern=TRUE)
+  OperationEnd(operation)
+  log
 }
 
 
@@ -285,11 +320,15 @@ StoreTablePunchcard <- function(df) {
 
 
 StorePlot <- function(plot, name) {
-  ggplot2::ggsave( filename = FilePath(type="plot", name=name, format="png")
+  filepath <- FilePath(type="plot", name=name, format="png")
+  operation <- sprintf("storing plot: %s", filepath)
+  OperationBegin(operation)
+  ggplot2::ggsave( filename = filepath
                  , plot     = plot
                  , width    = 10
                  , height   = 5
                  )
+  OperationEnd(operation)
 }
 
 
