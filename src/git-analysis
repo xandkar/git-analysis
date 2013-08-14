@@ -161,19 +161,19 @@ ParseLog <- function(lines) {
 }
 
 
-LookupEdits <- function(punchcard.row, commits.tbl) {
-  commits.tbl <- commits.tbl[ commits.tbl$Day  == punchcard.row["Day"]
-                            & commits.tbl$Hour == punchcard.row["Hour"]
-                            & commits.tbl$Name == punchcard.row["Name"]
-                            ,
-                            ]
-  if (nrow(commits.tbl) > 0) {
-    c( sum(commits.tbl$TotalInsertions)
-     , sum(commits.tbl$TotalDeletions)
-     )
-  } else {
-    c(0, 0)
-  }
+LookupEdits <- function(punchcard.row, edits.per.punch.hole) {
+  punch.hole <- paste( c( punchcard.row["Day"]
+                        , punchcard.row["Hour"]
+                        , punchcard.row["Name"]
+                        )
+                     , collapse="-"
+                     )
+  edits <- edits.per.punch.hole[[punch.hole]]
+  insertions <- edits$TotalInsertions
+  deletions  <- edits$TotalDeletions
+  c( ifelse(length(insertions) == 1, insertions, 0)
+   , ifelse(length(deletions)  == 1, deletions,  0)
+   )
 }
 
 
@@ -183,8 +183,8 @@ PunchCard <- function(commits.tbl) {
 
   operation <- "lookup edits per slot in punchard"
   OperationBegin(operation)
-  # The following call to "apply" was 84% of the cost, accodrding to Rprof
-  edits <- apply(punchcard.tbl, 1, LookupEdits, commits.tbl)
+  edits.per.punch.hole <- EditsPerPunchHole(commits.tbl)
+  edits <- apply(punchcard.tbl, 1, LookupEdits, edits.per.punch.hole)
   OperationEnd(operation)
 
   insertions <- edits[1, ]
@@ -411,7 +411,40 @@ ConstructTableOfCommits <- function(commits.log) {
             , TotalFiles      = sapply(commits, function(c) c$num.files )
             , TotalInsertions = sapply(commits, function(c) c$num.insertions )
             , TotalDeletions  = sapply(commits, function(c) c$num.deletions )
+
+            , stringsAsFactors = FALSE
             )
+}
+
+
+EditsPerPunchHole <- function(commits.tbl) {
+  edits.per.punch.hole <- list()
+  for (i in 1:nrow(commits.tbl)) {
+    row <- commits.tbl[i, ]
+    row.insertions <- as.numeric(row["TotalInsertions"])
+    row.deletions  <- as.numeric(row["TotalDeletions"])
+
+    row.day.index  <- as.numeric(row["Day"])
+    row.hour.index <- as.numeric(row["Hour"])
+
+    row.day  <- kAllDays[row.day.index]
+    row.hour <- kAllHours[row.hour.index]
+    row.name <- row["Name"]
+
+    punch.hole <- paste(c(row.day, row.hour, row.name), collapse="-")
+    edits <- edits.per.punch.hole[[punch.hole]]
+
+    insertions <- edits$TotalInsertions
+    insertions <- if (is.null(insertions)) 0 else insertions
+    deletions <- edits$TotalDeletions
+    deletions <- if (is.null(deletions)) 0 else deletions
+
+    edits$TotalInsertions <- (insertions + row.insertions)
+    edits$TotalDeletions  <- (deletions + row.deletions)
+
+    edits.per.punch.hole[[punch.hole]] <- edits
+  }
+  edits.per.punch.hole
 }
 
 
