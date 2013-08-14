@@ -11,7 +11,7 @@ Compare punchcards of top 4 committers to Erlang/OTP repository:
 $ git clone git://github.com/erlang/otp.git
 $ cd otp
 $ time git-analysis -n 4
-145.09s user 0.38s system 99% cpu 2:25.63 total
+48.74s user 0.34s system 100% cpu 49.044 total
 $ ls -1 .git-analysis
 plot-distribution-edits-per-commit-hist.png
 plot-distribution-edits-per-commit-kde.png
