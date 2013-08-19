@@ -442,10 +442,7 @@ EditsPerPunchHole <- function(commits.tbl) {
     edits$TotalInsertions <- (insertions + row.insertions)
     edits$TotalDeletions  <- (deletions + row.deletions)
 
-    # Assigning to a name using the dollar syntax, apparently avoids
-    # re-allocation and is thus faster. The difference is only noticeable on
-    # large datasets though.
-    edits.per.punch.hole$`punch.hole` <- edits
+    edits.per.punch.hole[[punch.hole]] <- edits
   }
   edits.per.punch.hole
 }
