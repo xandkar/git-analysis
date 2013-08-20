@@ -214,6 +214,12 @@ PlotTimeline <- function(commits.tbl) {
 
   timeline.of.change.volumes <- rbind(insertions, deletions)
 
+  # TODO: How to avoid the coercion of timestamps to ints?
+  timeline.of.change.volumes$Timestamp <-
+    as.POSIXct( timeline.of.change.volumes$Timestamp
+              , origin="1970-01-01 00:00:00"
+              )
+
   color.assignmnets <-
     c( "Insertion" = scales::muted("green")
      , "Deletion"  = scales::muted("red")
