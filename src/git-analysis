@@ -69,6 +69,7 @@ ParseTimestamp <- function(timestamp) {
 
   list( day  = factor(day , levels = kAllDays)
       , hour = factor(hour, levels = kAllHours)
+      , timestamp = as.POSIXct(timestamp, format="%a %b %d %T %Y %z")
       )
 }
 
@@ -111,6 +112,7 @@ ParseCommit <- function(commit) {
   edits <- matrix(edits, ncol=3, byrow=TRUE)
 
   list( hash           = hash
+      , timestamp      = timestamp$timestamp
       , day            = timestamp$day
       , hour           = timestamp$hour
       , name           = name
@@ -193,6 +195,41 @@ PunchCard <- function(commits.tbl) {
   punchcard.tbl$Diff  <- insertions - deletions
   punchcard.tbl$Edits <- insertions + deletions
   punchcard.tbl
+}
+
+
+PlotTimeline <- function(commits.tbl) {
+  edit.types <- c("Insertion", "Deletion")
+
+  insertions <- commits.tbl[, c("Timestamp", "TotalInsertions", "Name")]
+  deletions  <- commits.tbl[, c("Timestamp", "TotalDeletions", "Name")]
+
+  names(insertions) <- c("Timestamp", "ChangeVolume", "Name")
+  names(deletions)  <- c("Timestamp", "ChangeVolume", "Name")
+
+  insertions$ChangeType <- factor("Insertion", levels=edit.types)
+  deletions$ChangeType  <- factor("Deletion" , levels=edit.types)
+
+  deletions$ChangeVolume <- -(deletions$ChangeVolume)
+
+  timeline.of.change.volumes <- rbind(insertions, deletions)
+
+  color.assignmnets <-
+    c( "Insertion" = scales::muted("green")
+     , "Deletion"  = scales::muted("red")
+     )
+
+  timeline <-
+    ( ggplot2::ggplot(timeline.of.change.volumes)
+    + ggplot2::aes( x     = Timestamp
+                  , y     = ChangeVolume
+                  , color = ChangeType
+                  , fill  = ChangeType
+                  )
+    + ggplot2::geom_line()
+    + ggplot2::scale_colour_manual(values=color.assignmnets)
+    )
+  list(change.volumes=timeline)
 }
 
 
@@ -332,6 +369,19 @@ StorePlot <- function(plot, name) {
 }
 
 
+StorePlotsTimeline <- function(plots) {
+  plot.names <- names(plots)
+  plot.names <- gsub("\\.", "-", plot.names)
+  plot.names <- paste("timeline", plot.names, sep="-")
+  len <- length(plots)
+  if (len > 0) {
+    for (i in 1:len) {
+      StorePlot(plots[[i]], plot.names[i])
+    }
+  }
+}
+
+
 StorePlotsDistributions <- function(plots) {
   plot.names <- names(plots)
   plot.names <- gsub("\\.", "-", plot.names)
@@ -405,6 +455,7 @@ ConstructTableOfEdits <- function(commits.log) {
 ConstructTableOfCommits <- function(commits.log) {
   commits <- commits.log
   data.frame( Hash            = sapply(commits, function(c) c$hash )
+            , Timestamp       = sapply(commits, function(c) c$timestamp )
             , Day             = sapply(commits, function(c) c$day )
             , Hour            = sapply(commits, function(c) c$hour )
             , Name            = sapply(commits, function(c) c$name )
@@ -466,6 +517,9 @@ Main <- function() {
 
   commits.tbl <- ConstructTableOfCommits(commits.log)
   StoreTableCommits(commits.tbl)
+
+  timeline.plots <- PlotTimeline(commits.tbl)
+  StorePlotsTimeline(timeline.plots)
 
   top.n.commiters <- GetTopCommitters(commits.tbl, opt$n_top_committers)
 
