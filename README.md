@@ -30,11 +30,11 @@ table-punchcard.csv.gz
 `plot-punchcard-top-4-committers-edits.png`: punch holes color-scaled by total
 edits
 (insertions + deletions)
-![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-edits.png)
+![Erlang/OTP](https://raw.github.com/xandkar/git-analysis/master/examples/otp-punchcard-top-4-edits.png)
 
 `plot-punchcard-top-4-committers-diff.png`: punch holes color-scaled by diff
 proportions (insertions - deletions):
-![Erlang/OTP](https://raw.github.com/ibnfirnas/git-analysis/master/examples/otp-punchcard-top-4-diff.png)
+![Erlang/OTP](https://raw.github.com/xandkar/git-analysis/master/examples/otp-punchcard-top-4-diff.png)
 
 
 TODO
